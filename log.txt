@@ -1,0 +1,2431 @@
+# of parameters = 3
+factive = 71.59397888183594
+
+pairstiff = 108.22211456298828
+
+tau = 6.412824630737305
+
+-----------------------
+                
+ Timestep: 0                 
+ # of Cells: 4000                 
+ Since last log 0.2172 seconds                 
+ Total Runtime: 0.2172 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 83                 
+ # of Cells: 4005                 
+ Since last log 3.578 seconds                 
+ Total Runtime: 3.795 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 166                 
+ # of Cells: 4014                 
+ Since last log 3.968 seconds                 
+ Total Runtime: 7.764 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 249                 
+ # of Cells: 4014                 
+ Since last log 3.677 seconds                 
+ Total Runtime: 11.44 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 332                 
+ # of Cells: 4022                 
+ Since last log 3.973 seconds                 
+ Total Runtime: 15.42 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 415                 
+ # of Cells: 4027                 
+ Since last log 3.861 seconds                 
+ Total Runtime: 19.28 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 498                 
+ # of Cells: 4030                 
+ Since last log 3.823 seconds                 
+ Total Runtime: 23.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 581                 
+ # of Cells: 4036                 
+ Since last log 4.113 seconds                 
+ Total Runtime: 27.21 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 664                 
+ # of Cells: 4040                 
+ Since last log 4.017 seconds                 
+ Total Runtime: 31.23 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 747                 
+ # of Cells: 4040                 
+ Since last log 3.86 seconds                 
+ Total Runtime: 35.09 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 830                 
+ # of Cells: 4040                 
+ Since last log 4.031 seconds                 
+ Total Runtime: 39.12 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 913                 
+ # of Cells: 4041                 
+ Since last log 3.675 seconds                 
+ Total Runtime: 42.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 996                 
+ # of Cells: 4044                 
+ Since last log 4.121 seconds                 
+ Total Runtime: 46.92 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1079                 
+ # of Cells: 4047                 
+ Since last log 3.923 seconds                 
+ Total Runtime: 50.84 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1162                 
+ # of Cells: 4051                 
+ Since last log 3.784 seconds                 
+ Total Runtime: 54.63 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1245                 
+ # of Cells: 4055                 
+ Since last log 3.737 seconds                 
+ Total Runtime: 58.37 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1328                 
+ # of Cells: 4056                 
+ Since last log 4.193 seconds                 
+ Total Runtime: 62.56 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1411                 
+ # of Cells: 4056                 
+ Since last log 3.604 seconds                 
+ Total Runtime: 66.17 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1494                 
+ # of Cells: 4059                 
+ Since last log 3.828 seconds                 
+ Total Runtime: 70.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1577                 
+ # of Cells: 4060                 
+ Since last log 3.657 seconds                 
+ Total Runtime: 73.65 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1660                 
+ # of Cells: 4061                 
+ Since last log 3.844 seconds                 
+ Total Runtime: 77.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1743                 
+ # of Cells: 4059                 
+ Since last log 3.712 seconds                 
+ Total Runtime: 81.21 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1826                 
+ # of Cells: 4060                 
+ Since last log 3.668 seconds                 
+ Total Runtime: 84.88 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1909                 
+ # of Cells: 4062                 
+ Since last log 3.987 seconds                 
+ Total Runtime: 88.87 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 1992                 
+ # of Cells: 4060                 
+ Since last log 3.383 seconds                 
+ Total Runtime: 92.25 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2075                 
+ # of Cells: 4059                 
+ Since last log 3.564 seconds                 
+ Total Runtime: 95.81 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2158                 
+ # of Cells: 4063                 
+ Since last log 3.65 seconds                 
+ Total Runtime: 99.47 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2241                 
+ # of Cells: 4063                 
+ Since last log 3.564 seconds                 
+ Total Runtime: 103.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2324                 
+ # of Cells: 4066                 
+ Since last log 3.879 seconds                 
+ Total Runtime: 106.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2407                 
+ # of Cells: 4068                 
+ Since last log 3.722 seconds                 
+ Total Runtime: 110.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2490                 
+ # of Cells: 4067                 
+ Since last log 3.549 seconds                 
+ Total Runtime: 114.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2573                 
+ # of Cells: 4062                 
+ Since last log 3.467 seconds                 
+ Total Runtime: 117.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2656                 
+ # of Cells: 4061                 
+ Since last log 3.723 seconds                 
+ Total Runtime: 121.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2739                 
+ # of Cells: 4060                 
+ Since last log 3.378 seconds                 
+ Total Runtime: 124.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2822                 
+ # of Cells: 4062                 
+ Since last log 3.74 seconds                 
+ Total Runtime: 128.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2905                 
+ # of Cells: 4063                 
+ Since last log 3.549 seconds                 
+ Total Runtime: 132.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 2988                 
+ # of Cells: 4062                 
+ Since last log 3.582 seconds                 
+ Total Runtime: 135.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3071                 
+ # of Cells: 4061                 
+ Since last log 4.07 seconds                 
+ Total Runtime: 139.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3154                 
+ # of Cells: 4063                 
+ Since last log 3.405 seconds                 
+ Total Runtime: 143.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3237                 
+ # of Cells: 4063                 
+ Since last log 3.8 seconds                 
+ Total Runtime: 146.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3320                 
+ # of Cells: 4065                 
+ Since last log 3.753 seconds                 
+ Total Runtime: 150.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3403                 
+ # of Cells: 4063                 
+ Since last log 3.447 seconds                 
+ Total Runtime: 154.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3486                 
+ # of Cells: 4066                 
+ Since last log 3.521 seconds                 
+ Total Runtime: 157.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3569                 
+ # of Cells: 4061                 
+ Since last log 3.342 seconds                 
+ Total Runtime: 161.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3652                 
+ # of Cells: 4062                 
+ Since last log 3.705 seconds                 
+ Total Runtime: 164.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3735                 
+ # of Cells: 4061                 
+ Since last log 3.792 seconds                 
+ Total Runtime: 168.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3818                 
+ # of Cells: 4062                 
+ Since last log 3.461 seconds                 
+ Total Runtime: 171.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3901                 
+ # of Cells: 4061                 
+ Since last log 3.582 seconds                 
+ Total Runtime: 175.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 3984                 
+ # of Cells: 4061                 
+ Since last log 3.385 seconds                 
+ Total Runtime: 178.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4067                 
+ # of Cells: 4062                 
+ Since last log 3.427 seconds                 
+ Total Runtime: 182.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4150                 
+ # of Cells: 4063                 
+ Since last log 3.425 seconds                 
+ Total Runtime: 185.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4233                 
+ # of Cells: 4064                 
+ Since last log 3.418 seconds                 
+ Total Runtime: 189.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4316                 
+ # of Cells: 4065                 
+ Since last log 3.531 seconds                 
+ Total Runtime: 192.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4399                 
+ # of Cells: 4063                 
+ Since last log 3.536 seconds                 
+ Total Runtime: 196.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4482                 
+ # of Cells: 4062                 
+ Since last log 3.597 seconds                 
+ Total Runtime: 199.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4565                 
+ # of Cells: 4065                 
+ Since last log 3.666 seconds                 
+ Total Runtime: 203.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4648                 
+ # of Cells: 4062                 
+ Since last log 3.572 seconds                 
+ Total Runtime: 207.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4731                 
+ # of Cells: 4062                 
+ Since last log 3.406 seconds                 
+ Total Runtime: 210.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4814                 
+ # of Cells: 4062                 
+ Since last log 3.551 seconds                 
+ Total Runtime: 214.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4897                 
+ # of Cells: 4063                 
+ Since last log 3.26 seconds                 
+ Total Runtime: 217.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 4980                 
+ # of Cells: 4063                 
+ Since last log 3.304 seconds                 
+ Total Runtime: 220.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5063                 
+ # of Cells: 4063                 
+ Since last log 3.731 seconds                 
+ Total Runtime: 224.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5146                 
+ # of Cells: 4064                 
+ Since last log 3.144 seconds                 
+ Total Runtime: 227.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5229                 
+ # of Cells: 4069                 
+ Since last log 3.388 seconds                 
+ Total Runtime: 230.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5312                 
+ # of Cells: 4071                 
+ Since last log 3.649 seconds                 
+ Total Runtime: 234.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5395                 
+ # of Cells: 4071                 
+ Since last log 3.253 seconds                 
+ Total Runtime: 237.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5478                 
+ # of Cells: 4069                 
+ Since last log 3.315 seconds                 
+ Total Runtime: 241.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5561                 
+ # of Cells: 4069                 
+ Since last log 3.657 seconds                 
+ Total Runtime: 244.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5644                 
+ # of Cells: 4069                 
+ Since last log 3.175 seconds                 
+ Total Runtime: 247.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5727                 
+ # of Cells: 4069                 
+ Since last log 3.677 seconds                 
+ Total Runtime: 251.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5810                 
+ # of Cells: 4069                 
+ Since last log 3.397 seconds                 
+ Total Runtime: 255.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5893                 
+ # of Cells: 4070                 
+ Since last log 3.318 seconds                 
+ Total Runtime: 258.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 5976                 
+ # of Cells: 4069                 
+ Since last log 3.278 seconds                 
+ Total Runtime: 261.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6059                 
+ # of Cells: 4070                 
+ Since last log 3.235 seconds                 
+ Total Runtime: 264.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6142                 
+ # of Cells: 4068                 
+ Since last log 3.473 seconds                 
+ Total Runtime: 268.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6225                 
+ # of Cells: 4071                 
+ Since last log 3.632 seconds                 
+ Total Runtime: 271.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6308                 
+ # of Cells: 4071                 
+ Since last log 3.136 seconds                 
+ Total Runtime: 275.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6391                 
+ # of Cells: 4071                 
+ Since last log 3.576 seconds                 
+ Total Runtime: 278.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6474                 
+ # of Cells: 4067                 
+ Since last log 3.205 seconds                 
+ Total Runtime: 281.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6557                 
+ # of Cells: 4069                 
+ Since last log 3.356 seconds                 
+ Total Runtime: 285.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6640                 
+ # of Cells: 4071                 
+ Since last log 3.596 seconds                 
+ Total Runtime: 288.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6723                 
+ # of Cells: 4071                 
+ Since last log 3.477 seconds                 
+ Total Runtime: 292.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6806                 
+ # of Cells: 4069                 
+ Since last log 3.619 seconds                 
+ Total Runtime: 295.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6889                 
+ # of Cells: 4070                 
+ Since last log 3.619 seconds                 
+ Total Runtime: 299.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 6972                 
+ # of Cells: 4071                 
+ Since last log 3.431 seconds                 
+ Total Runtime: 303.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7055                 
+ # of Cells: 4069                 
+ Since last log 3.376 seconds                 
+ Total Runtime: 306.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7138                 
+ # of Cells: 4069                 
+ Since last log 3.35 seconds                 
+ Total Runtime: 309.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7221                 
+ # of Cells: 4071                 
+ Since last log 3.513 seconds                 
+ Total Runtime: 313.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7304                 
+ # of Cells: 4071                 
+ Since last log 3.605 seconds                 
+ Total Runtime: 316.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7387                 
+ # of Cells: 4070                 
+ Since last log 3.294 seconds                 
+ Total Runtime: 320.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7470                 
+ # of Cells: 4073                 
+ Since last log 3.547 seconds                 
+ Total Runtime: 323.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7553                 
+ # of Cells: 4072                 
+ Since last log 3.453 seconds                 
+ Total Runtime: 327.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7636                 
+ # of Cells: 4070                 
+ Since last log 3.341 seconds                 
+ Total Runtime: 330.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7719                 
+ # of Cells: 4069                 
+ Since last log 3.434 seconds                 
+ Total Runtime: 333.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7802                 
+ # of Cells: 4071                 
+ Since last log 3.337 seconds                 
+ Total Runtime: 337.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7885                 
+ # of Cells: 4074                 
+ Since last log 3.508 seconds                 
+ Total Runtime: 340.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 7968                 
+ # of Cells: 4074                 
+ Since last log 3.487 seconds                 
+ Total Runtime: 344.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8051                 
+ # of Cells: 4076                 
+ Since last log 3.261 seconds                 
+ Total Runtime: 347.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8134                 
+ # of Cells: 4076                 
+ Since last log 3.572 seconds                 
+ Total Runtime: 351.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8217                 
+ # of Cells: 4077                 
+ Since last log 3.435 seconds                 
+ Total Runtime: 354.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8300                 
+ # of Cells: 4078                 
+ Since last log 3.248 seconds                 
+ Total Runtime: 357.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8383                 
+ # of Cells: 4080                 
+ Since last log 3.442 seconds                 
+ Total Runtime: 361.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8466                 
+ # of Cells: 4080                 
+ Since last log 3.472 seconds                 
+ Total Runtime: 364.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8549                 
+ # of Cells: 4081                 
+ Since last log 3.383 seconds                 
+ Total Runtime: 368.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8632                 
+ # of Cells: 4080                 
+ Since last log 3.342 seconds                 
+ Total Runtime: 371.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8715                 
+ # of Cells: 4079                 
+ Since last log 3.445 seconds                 
+ Total Runtime: 374.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8798                 
+ # of Cells: 4079                 
+ Since last log 3.38 seconds                 
+ Total Runtime: 378.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8881                 
+ # of Cells: 4079                 
+ Since last log 3.552 seconds                 
+ Total Runtime: 381.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 8964                 
+ # of Cells: 4080                 
+ Since last log 3.227 seconds                 
+ Total Runtime: 385.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9047                 
+ # of Cells: 4079                 
+ Since last log 3.525 seconds                 
+ Total Runtime: 388.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9130                 
+ # of Cells: 4078                 
+ Since last log 3.293 seconds                 
+ Total Runtime: 391.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9213                 
+ # of Cells: 4076                 
+ Since last log 3.342 seconds                 
+ Total Runtime: 395.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9296                 
+ # of Cells: 4078                 
+ Since last log 3.554 seconds                 
+ Total Runtime: 398.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9379                 
+ # of Cells: 4077                 
+ Since last log 3.333 seconds                 
+ Total Runtime: 402.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9462                 
+ # of Cells: 4076                 
+ Since last log 3.475 seconds                 
+ Total Runtime: 405.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9545                 
+ # of Cells: 4078                 
+ Since last log 3.7 seconds                 
+ Total Runtime: 409.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9628                 
+ # of Cells: 4077                 
+ Since last log 3.192 seconds                 
+ Total Runtime: 412.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9711                 
+ # of Cells: 4078                 
+ Since last log 3.839 seconds                 
+ Total Runtime: 416.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9794                 
+ # of Cells: 4078                 
+ Since last log 3.364 seconds                 
+ Total Runtime: 419.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9877                 
+ # of Cells: 4078                 
+ Since last log 3.116 seconds                 
+ Total Runtime: 422.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 9960                 
+ # of Cells: 4078                 
+ Since last log 3.396 seconds                 
+ Total Runtime: 426.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10043                 
+ # of Cells: 4079                 
+ Since last log 3.45 seconds                 
+ Total Runtime: 429.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10126                 
+ # of Cells: 4083                 
+ Since last log 3.474 seconds                 
+ Total Runtime: 433.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10209                 
+ # of Cells: 4082                 
+ Since last log 3.389 seconds                 
+ Total Runtime: 436.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10292                 
+ # of Cells: 4082                 
+ Since last log 3.265 seconds                 
+ Total Runtime: 439.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10375                 
+ # of Cells: 4080                 
+ Since last log 3.436 seconds                 
+ Total Runtime: 443.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10458                 
+ # of Cells: 4082                 
+ Since last log 3.323 seconds                 
+ Total Runtime: 446.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10541                 
+ # of Cells: 4082                 
+ Since last log 3.204 seconds                 
+ Total Runtime: 449.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10624                 
+ # of Cells: 4083                 
+ Since last log 3.211 seconds                 
+ Total Runtime: 452.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10707                 
+ # of Cells: 4083                 
+ Since last log 3.231 seconds                 
+ Total Runtime: 456.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10790                 
+ # of Cells: 4081                 
+ Since last log 3.699 seconds                 
+ Total Runtime: 459.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10873                 
+ # of Cells: 4081                 
+ Since last log 3.61 seconds                 
+ Total Runtime: 463.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 10956                 
+ # of Cells: 4080                 
+ Since last log 3.591 seconds                 
+ Total Runtime: 467.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11039                 
+ # of Cells: 4079                 
+ Since last log 3.617 seconds                 
+ Total Runtime: 470.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11122                 
+ # of Cells: 4078                 
+ Since last log 3.401 seconds                 
+ Total Runtime: 474.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11205                 
+ # of Cells: 4077                 
+ Since last log 3.06 seconds                 
+ Total Runtime: 477.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11288                 
+ # of Cells: 4074                 
+ Since last log 3.446 seconds                 
+ Total Runtime: 480.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11371                 
+ # of Cells: 4073                 
+ Since last log 3.551 seconds                 
+ Total Runtime: 484.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11454                 
+ # of Cells: 4072                 
+ Since last log 3.51 seconds                 
+ Total Runtime: 487.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11537                 
+ # of Cells: 4069                 
+ Since last log 3.094 seconds                 
+ Total Runtime: 490.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11620                 
+ # of Cells: 4067                 
+ Since last log 3.586 seconds                 
+ Total Runtime: 494.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11703                 
+ # of Cells: 4069                 
+ Since last log 3.505 seconds                 
+ Total Runtime: 497.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11786                 
+ # of Cells: 4073                 
+ Since last log 3.464 seconds                 
+ Total Runtime: 501.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11869                 
+ # of Cells: 4074                 
+ Since last log 3.19 seconds                 
+ Total Runtime: 504.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 11952                 
+ # of Cells: 4077                 
+ Since last log 3.466 seconds                 
+ Total Runtime: 507.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12035                 
+ # of Cells: 4078                 
+ Since last log 3.194 seconds                 
+ Total Runtime: 511.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12118                 
+ # of Cells: 4081                 
+ Since last log 3.319 seconds                 
+ Total Runtime: 514.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12201                 
+ # of Cells: 4082                 
+ Since last log 3.221 seconds                 
+ Total Runtime: 517.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12284                 
+ # of Cells: 4079                 
+ Since last log 3.208 seconds                 
+ Total Runtime: 520.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12367                 
+ # of Cells: 4078                 
+ Since last log 3.23 seconds                 
+ Total Runtime: 524.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12450                 
+ # of Cells: 4073                 
+ Since last log 3.48 seconds                 
+ Total Runtime: 527.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12533                 
+ # of Cells: 4074                 
+ Since last log 3.366 seconds                 
+ Total Runtime: 530.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12616                 
+ # of Cells: 4071                 
+ Since last log 3.467 seconds                 
+ Total Runtime: 534.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12699                 
+ # of Cells: 4069                 
+ Since last log 3.494 seconds                 
+ Total Runtime: 537.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12782                 
+ # of Cells: 4072                 
+ Since last log 3.465 seconds                 
+ Total Runtime: 541.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12865                 
+ # of Cells: 4072                 
+ Since last log 3.4 seconds                 
+ Total Runtime: 544.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 12948                 
+ # of Cells: 4072                 
+ Since last log 3.011 seconds                 
+ Total Runtime: 547.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13031                 
+ # of Cells: 4072                 
+ Since last log 3.175 seconds                 
+ Total Runtime: 550.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13114                 
+ # of Cells: 4074                 
+ Since last log 3.468 seconds                 
+ Total Runtime: 554.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13197                 
+ # of Cells: 4074                 
+ Since last log 3.345 seconds                 
+ Total Runtime: 557.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13280                 
+ # of Cells: 4073                 
+ Since last log 3.41 seconds                 
+ Total Runtime: 561.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13363                 
+ # of Cells: 4073                 
+ Since last log 3.374 seconds                 
+ Total Runtime: 564.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13446                 
+ # of Cells: 4074                 
+ Since last log 3.209 seconds                 
+ Total Runtime: 567.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13529                 
+ # of Cells: 4073                 
+ Since last log 3.544 seconds                 
+ Total Runtime: 571.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13612                 
+ # of Cells: 4074                 
+ Since last log 3.24 seconds                 
+ Total Runtime: 574.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13695                 
+ # of Cells: 4073                 
+ Since last log 3.724 seconds                 
+ Total Runtime: 578.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13778                 
+ # of Cells: 4074                 
+ Since last log 3.53 seconds                 
+ Total Runtime: 581.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13861                 
+ # of Cells: 4071                 
+ Since last log 3.365 seconds                 
+ Total Runtime: 585.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 13944                 
+ # of Cells: 4070                 
+ Since last log 3.35 seconds                 
+ Total Runtime: 588.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14027                 
+ # of Cells: 4073                 
+ Since last log 3.483 seconds                 
+ Total Runtime: 592.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14110                 
+ # of Cells: 4073                 
+ Since last log 3.152 seconds                 
+ Total Runtime: 595.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14193                 
+ # of Cells: 4070                 
+ Since last log 3.558 seconds                 
+ Total Runtime: 598.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14276                 
+ # of Cells: 4070                 
+ Since last log 3.235 seconds                 
+ Total Runtime: 601.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14359                 
+ # of Cells: 4073                 
+ Since last log 3.279 seconds                 
+ Total Runtime: 605.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14442                 
+ # of Cells: 4074                 
+ Since last log 3.379 seconds                 
+ Total Runtime: 608.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14525                 
+ # of Cells: 4075                 
+ Since last log 3.146 seconds                 
+ Total Runtime: 611.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14608                 
+ # of Cells: 4076                 
+ Since last log 3.331 seconds                 
+ Total Runtime: 615.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14691                 
+ # of Cells: 4075                 
+ Since last log 3.403 seconds                 
+ Total Runtime: 618.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14774                 
+ # of Cells: 4078                 
+ Since last log 3.131 seconds                 
+ Total Runtime: 621.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14857                 
+ # of Cells: 4080                 
+ Since last log 3.557 seconds                 
+ Total Runtime: 625.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 14940                 
+ # of Cells: 4079                 
+ Since last log 3.465 seconds                 
+ Total Runtime: 628.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15023                 
+ # of Cells: 4079                 
+ Since last log 3.704 seconds                 
+ Total Runtime: 632.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15106                 
+ # of Cells: 4079                 
+ Since last log 3.415 seconds                 
+ Total Runtime: 635.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15189                 
+ # of Cells: 4080                 
+ Since last log 3.365 seconds                 
+ Total Runtime: 639.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15272                 
+ # of Cells: 4086                 
+ Since last log 3.728 seconds                 
+ Total Runtime: 642.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15355                 
+ # of Cells: 4090                 
+ Since last log 3.636 seconds                 
+ Total Runtime: 646.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15438                 
+ # of Cells: 4091                 
+ Since last log 3.297 seconds                 
+ Total Runtime: 649.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15521                 
+ # of Cells: 4093                 
+ Since last log 3.408 seconds                 
+ Total Runtime: 653.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15604                 
+ # of Cells: 4091                 
+ Since last log 3.499 seconds                 
+ Total Runtime: 656.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15687                 
+ # of Cells: 4093                 
+ Since last log 3.313 seconds                 
+ Total Runtime: 660.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15770                 
+ # of Cells: 4091                 
+ Since last log 3.452 seconds                 
+ Total Runtime: 663.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15853                 
+ # of Cells: 4093                 
+ Since last log 3.341 seconds                 
+ Total Runtime: 666.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 15936                 
+ # of Cells: 4093                 
+ Since last log 3.607 seconds                 
+ Total Runtime: 670.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16019                 
+ # of Cells: 4092                 
+ Since last log 3.446 seconds                 
+ Total Runtime: 673.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16102                 
+ # of Cells: 4090                 
+ Since last log 3.249 seconds                 
+ Total Runtime: 677.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16185                 
+ # of Cells: 4092                 
+ Since last log 3.753 seconds                 
+ Total Runtime: 680.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16268                 
+ # of Cells: 4094                 
+ Since last log 3.364 seconds                 
+ Total Runtime: 684.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16351                 
+ # of Cells: 4095                 
+ Since last log 3.414 seconds                 
+ Total Runtime: 687.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16434                 
+ # of Cells: 4101                 
+ Since last log 3.382 seconds                 
+ Total Runtime: 691.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16517                 
+ # of Cells: 4101                 
+ Since last log 3.415 seconds                 
+ Total Runtime: 694.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16600                 
+ # of Cells: 4099                 
+ Since last log 3.391 seconds                 
+ Total Runtime: 697.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16683                 
+ # of Cells: 4102                 
+ Since last log 3.554 seconds                 
+ Total Runtime: 701.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16766                 
+ # of Cells: 4104                 
+ Since last log 3.18 seconds                 
+ Total Runtime: 704.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16849                 
+ # of Cells: 4102                 
+ Since last log 3.48 seconds                 
+ Total Runtime: 708.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 16932                 
+ # of Cells: 4101                 
+ Since last log 3.259 seconds                 
+ Total Runtime: 711.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17015                 
+ # of Cells: 4100                 
+ Since last log 3.545 seconds                 
+ Total Runtime: 714.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17098                 
+ # of Cells: 4102                 
+ Since last log 3.578 seconds                 
+ Total Runtime: 718.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17181                 
+ # of Cells: 4100                 
+ Since last log 3.087 seconds                 
+ Total Runtime: 721.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17264                 
+ # of Cells: 4099                 
+ Since last log 3.379 seconds                 
+ Total Runtime: 724.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17347                 
+ # of Cells: 4102                 
+ Since last log 3.588 seconds                 
+ Total Runtime: 728.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17430                 
+ # of Cells: 4103                 
+ Since last log 3.268 seconds                 
+ Total Runtime: 731.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17513                 
+ # of Cells: 4105                 
+ Since last log 3.47 seconds                 
+ Total Runtime: 735.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17596                 
+ # of Cells: 4106                 
+ Since last log 3.474 seconds                 
+ Total Runtime: 738.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17679                 
+ # of Cells: 4107                 
+ Since last log 3.28 seconds                 
+ Total Runtime: 742.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17762                 
+ # of Cells: 4108                 
+ Since last log 3.52 seconds                 
+ Total Runtime: 745.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17845                 
+ # of Cells: 4108                 
+ Since last log 3.248 seconds                 
+ Total Runtime: 748.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 17928                 
+ # of Cells: 4108                 
+ Since last log 3.765 seconds                 
+ Total Runtime: 752.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18011                 
+ # of Cells: 4107                 
+ Since last log 3.638 seconds                 
+ Total Runtime: 756.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18094                 
+ # of Cells: 4108                 
+ Since last log 3.312 seconds                 
+ Total Runtime: 759.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18177                 
+ # of Cells: 4105                 
+ Since last log 3.325 seconds                 
+ Total Runtime: 762.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18260                 
+ # of Cells: 4103                 
+ Since last log 3.54 seconds                 
+ Total Runtime: 766.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18343                 
+ # of Cells: 4103                 
+ Since last log 3.16 seconds                 
+ Total Runtime: 769.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18426                 
+ # of Cells: 4102                 
+ Since last log 3.473 seconds                 
+ Total Runtime: 773.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18509                 
+ # of Cells: 4103                 
+ Since last log 3.18 seconds                 
+ Total Runtime: 776.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18592                 
+ # of Cells: 4105                 
+ Since last log 3.73 seconds                 
+ Total Runtime: 779.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18675                 
+ # of Cells: 4106                 
+ Since last log 3.286 seconds                 
+ Total Runtime: 783.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18758                 
+ # of Cells: 4108                 
+ Since last log 3.324 seconds                 
+ Total Runtime: 786.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18841                 
+ # of Cells: 4109                 
+ Since last log 3.386 seconds                 
+ Total Runtime: 789.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 18924                 
+ # of Cells: 4110                 
+ Since last log 3.347 seconds                 
+ Total Runtime: 793.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19007                 
+ # of Cells: 4110                 
+ Since last log 3.313 seconds                 
+ Total Runtime: 796.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19090                 
+ # of Cells: 4113                 
+ Since last log 3.582 seconds                 
+ Total Runtime: 800.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19173                 
+ # of Cells: 4113                 
+ Since last log 3.29 seconds                 
+ Total Runtime: 803.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19256                 
+ # of Cells: 4118                 
+ Since last log 3.514 seconds                 
+ Total Runtime: 806.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19339                 
+ # of Cells: 4122                 
+ Since last log 3.741 seconds                 
+ Total Runtime: 810.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19422                 
+ # of Cells: 4121                 
+ Since last log 3.28 seconds                 
+ Total Runtime: 813.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19505                 
+ # of Cells: 4121                 
+ Since last log 3.541 seconds                 
+ Total Runtime: 817.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19588                 
+ # of Cells: 4118                 
+ Since last log 3.291 seconds                 
+ Total Runtime: 820.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19671                 
+ # of Cells: 4119                 
+ Since last log 3.378 seconds                 
+ Total Runtime: 824.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19754                 
+ # of Cells: 4119                 
+ Since last log 3.643 seconds                 
+ Total Runtime: 827.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19837                 
+ # of Cells: 4120                 
+ Since last log 3.291 seconds                 
+ Total Runtime: 831.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 19920                 
+ # of Cells: 4118                 
+ Since last log 3.627 seconds                 
+ Total Runtime: 834.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20003                 
+ # of Cells: 4118                 
+ Since last log 3.565 seconds                 
+ Total Runtime: 838.3 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20086                 
+ # of Cells: 4116                 
+ Since last log 3.27 seconds                 
+ Total Runtime: 841.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20169                 
+ # of Cells: 4117                 
+ Since last log 3.537 seconds                 
+ Total Runtime: 845.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20252                 
+ # of Cells: 4113                 
+ Since last log 3.483 seconds                 
+ Total Runtime: 848.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20335                 
+ # of Cells: 4115                 
+ Since last log 3.522 seconds                 
+ Total Runtime: 852.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20418                 
+ # of Cells: 4114                 
+ Since last log 3.356 seconds                 
+ Total Runtime: 855.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20501                 
+ # of Cells: 4115                 
+ Since last log 3.265 seconds                 
+ Total Runtime: 858.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20584                 
+ # of Cells: 4118                 
+ Since last log 3.4 seconds                 
+ Total Runtime: 862.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20667                 
+ # of Cells: 4119                 
+ Since last log 3.4 seconds                 
+ Total Runtime: 865.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20750                 
+ # of Cells: 4120                 
+ Since last log 3.275 seconds                 
+ Total Runtime: 868.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20833                 
+ # of Cells: 4117                 
+ Since last log 3.636 seconds                 
+ Total Runtime: 872.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20916                 
+ # of Cells: 4117                 
+ Since last log 3.248 seconds                 
+ Total Runtime: 875.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 20999                 
+ # of Cells: 4117                 
+ Since last log 3.302 seconds                 
+ Total Runtime: 879.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21082                 
+ # of Cells: 4121                 
+ Since last log 3.739 seconds                 
+ Total Runtime: 882.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21165                 
+ # of Cells: 4123                 
+ Since last log 3.394 seconds                 
+ Total Runtime: 886.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21248                 
+ # of Cells: 4123                 
+ Since last log 3.547 seconds                 
+ Total Runtime: 889.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21331                 
+ # of Cells: 4122                 
+ Since last log 3.497 seconds                 
+ Total Runtime: 893.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21414                 
+ # of Cells: 4121                 
+ Since last log 3.546 seconds                 
+ Total Runtime: 896.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21497                 
+ # of Cells: 4120                 
+ Since last log 3.446 seconds                 
+ Total Runtime: 900.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21580                 
+ # of Cells: 4123                 
+ Since last log 3.453 seconds                 
+ Total Runtime: 903.6 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21663                 
+ # of Cells: 4123                 
+ Since last log 3.324 seconds                 
+ Total Runtime: 906.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21746                 
+ # of Cells: 4123                 
+ Since last log 3.487 seconds                 
+ Total Runtime: 910.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21829                 
+ # of Cells: 4126                 
+ Since last log 3.661 seconds                 
+ Total Runtime: 914.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21912                 
+ # of Cells: 4126                 
+ Since last log 3.564 seconds                 
+ Total Runtime: 917.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 21995                 
+ # of Cells: 4128                 
+ Since last log 3.526 seconds                 
+ Total Runtime: 921.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22078                 
+ # of Cells: 4128                 
+ Since last log 3.355 seconds                 
+ Total Runtime: 924.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22161                 
+ # of Cells: 4128                 
+ Since last log 3.47 seconds                 
+ Total Runtime: 928.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22244                 
+ # of Cells: 4125                 
+ Since last log 3.76 seconds                 
+ Total Runtime: 931.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22327                 
+ # of Cells: 4125                 
+ Since last log 3.172 seconds                 
+ Total Runtime: 934.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22410                 
+ # of Cells: 4128                 
+ Since last log 3.504 seconds                 
+ Total Runtime: 938.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22493                 
+ # of Cells: 4127                 
+ Since last log 3.537 seconds                 
+ Total Runtime: 942.0 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22576                 
+ # of Cells: 4128                 
+ Since last log 3.538 seconds                 
+ Total Runtime: 945.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22659                 
+ # of Cells: 4129                 
+ Since last log 3.66 seconds                 
+ Total Runtime: 949.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22742                 
+ # of Cells: 4130                 
+ Since last log 3.21 seconds                 
+ Total Runtime: 952.4 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22825                 
+ # of Cells: 4131                 
+ Since last log 3.522 seconds                 
+ Total Runtime: 955.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22908                 
+ # of Cells: 4130                 
+ Since last log 3.538 seconds                 
+ Total Runtime: 959.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 22991                 
+ # of Cells: 4133                 
+ Since last log 3.361 seconds                 
+ Total Runtime: 962.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23074                 
+ # of Cells: 4133                 
+ Since last log 3.674 seconds                 
+ Total Runtime: 966.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23157                 
+ # of Cells: 4130                 
+ Since last log 3.446 seconds                 
+ Total Runtime: 969.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23240                 
+ # of Cells: 4131                 
+ Since last log 3.221 seconds                 
+ Total Runtime: 973.2 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23323                 
+ # of Cells: 4131                 
+ Since last log 3.485 seconds                 
+ Total Runtime: 976.7 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23406                 
+ # of Cells: 4130                 
+ Since last log 3.403 seconds                 
+ Total Runtime: 980.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23489                 
+ # of Cells: 4132                 
+ Since last log 3.715 seconds                 
+ Total Runtime: 983.8 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23572                 
+ # of Cells: 4136                 
+ Since last log 3.733 seconds                 
+ Total Runtime: 987.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23655                 
+ # of Cells: 4134                 
+ Since last log 3.434 seconds                 
+ Total Runtime: 990.9 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23738                 
+ # of Cells: 4133                 
+ Since last log 3.522 seconds                 
+ Total Runtime: 994.5 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23821                 
+ # of Cells: 4135                 
+ Since last log 3.661 seconds                 
+ Total Runtime: 998.1 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23904                 
+ # of Cells: 4133                 
+ Since last log 3.489 seconds                 
+ Total Runtime: 1.002e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 23987                 
+ # of Cells: 4133                 
+ Since last log 3.811 seconds                 
+ Total Runtime: 1.005e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24070                 
+ # of Cells: 4132                 
+ Since last log 3.63 seconds                 
+ Total Runtime: 1.009e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24153                 
+ # of Cells: 4136                 
+ Since last log 3.803 seconds                 
+ Total Runtime: 1.013e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24236                 
+ # of Cells: 4136                 
+ Since last log 3.719 seconds                 
+ Total Runtime: 1.017e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24319                 
+ # of Cells: 4137                 
+ Since last log 3.385 seconds                 
+ Total Runtime: 1.02e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24402                 
+ # of Cells: 4140                 
+ Since last log 3.604 seconds                 
+ Total Runtime: 1.024e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24485                 
+ # of Cells: 4140                 
+ Since last log 3.628 seconds                 
+ Total Runtime: 1.027e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24568                 
+ # of Cells: 4140                 
+ Since last log 3.426 seconds                 
+ Total Runtime: 1.031e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24651                 
+ # of Cells: 4143                 
+ Since last log 3.653 seconds                 
+ Total Runtime: 1.034e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24734                 
+ # of Cells: 4142                 
+ Since last log 3.447 seconds                 
+ Total Runtime: 1.038e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24817                 
+ # of Cells: 4139                 
+ Since last log 3.415 seconds                 
+ Total Runtime: 1.041e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24900                 
+ # of Cells: 4140                 
+ Since last log 3.376 seconds                 
+ Total Runtime: 1.045e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 24983                 
+ # of Cells: 4138                 
+ Since last log 3.401 seconds                 
+ Total Runtime: 1.048e+03 seconds
+                
+ -----------------------
+-----------------------
+                
+ Timestep: 25066                 
+ # of Cells: 4137                 
+ Since last log 3.358 seconds                 
+ Total Runtime: 1.051e+03 seconds
+                
+ -----------------------

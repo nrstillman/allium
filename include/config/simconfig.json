@@ -1,0 +1,93 @@
+{
+    "outputfolder": "allium/data/sim/",
+    "filename": "wound_healing",
+    "output_time": 83, 
+    "output_type": "all",
+    "t_final": 39840, 
+    "popdynfreq": 51,
+    "zaptime": 26560, 
+    
+    "phi": 1,
+    "R": 10,
+
+    "Lx": 1600,
+    "Ly": 800,
+
+    "dt": 0.001,
+    "dim": 2,
+
+    "eps": 0.001,
+    "N": 4000,
+    "init_opt": "random_unif",
+    "bc_opt": "periodic",
+    "Ntracer": 100,
+    "Nstem": 0,
+    "btype": 0,
+    "flag": 0,
+    "type": 0,
+    "poly": 0.3,
+    "cutoff": 3,
+    "ntypes": 1,
+    "fade": 1,
+    "pairstiff": [
+        [
+            10,
+            10,
+            10
+        ],
+        [
+            10,
+            60,
+            60
+        ],
+        [
+            10,
+            60,
+            60
+        ]
+    ],
+
+    "pairatt": [
+        [
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0.15,
+            0.15
+        ],
+        [
+            0,
+            0.15,
+            0.15
+        ]
+    ],
+    "factive": [
+        0,
+        70,
+        70
+    ],
+    "zeta": [
+        0,
+        1,
+        1
+    ],
+    "tau": [
+        0,
+        2.5,
+        2.5
+    ],
+    "deathrate": [
+        0,
+        0,
+        0.005
+    ],
+    "divrate": [
+        0.0,
+        0.0,
+        0.2
+    ],
+    "maxZ": 6
+}
