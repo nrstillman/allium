@@ -24,14 +24,14 @@ def exp_ss(data, exp_length = 95):
     msd = calculate_msd(data,flags=flags)
     return msd
 
-def average_horizontal_displacement(output, tracers=True):
+def average_horizontal_displacement(data, tracers=True, beg = 0, end = 319):
     # prefer to use tracers particles
-    data = output['data'][:319]
+    data = data[beg:end]
     if tracers:
-        t0_flag =  data[0][data[0][:,-1] == 1][:,0]
+        t0_flag =  data[beg][data[beg][:,-1] == 1][:,0]
     # only take original cells (note - some of these may have died? see condition below)
     else:
-        t0_flag =  data[0][:,0]
+        t0_flag =  data[beg][:,0]
 
     #Error check for missing flags ... TODO
     # tf_flag  = flags = data[-1][data[-1][:,-1] == 1][:,0]    
@@ -42,31 +42,37 @@ def average_horizontal_displacement(output, tracers=True):
     indices = []
     dx = []
     for f in t0_flag:
-        tf=  output['data'][319]
-        t0=  output['data'][0]
+        tf=  data[end]
+        t0=  data[beg]
         dx.append(np.abs(tf[tf[:,0] == f][:,1]  - t0[t0[:,0] == f][:,1]))
     return np.asarray(dx).mean() 
 
 def change_in_phi(output):
     return (len(output['data'][-1]) - len(output['data'][0]))*output['params']['R']/(output['params']['Lx']*output['params']['Ly'])
 
-def calculate_msd(data, tracers=True, flags=None):
+def calculate_msd(data, tracers=True, flags=None, beg = 0, end=319):
     if flags is None:
         if tracers:
-            flags = data[0][data[0][:,-1] == 1][:,0]
+            flags = data[beg][data[beg][:,-1] == 1][:,0]
         else:
-            flags = data[0][:,0]
+            flags = data[beg][:,0]
 
     msd = []
     for f in flags:
         r = []
         #there is a better way to do this...
         if type(data) is list:
-            for i, d in enumerate(data[:319]):
+            calculate = True
+            for i, d in enumerate(data[beg:end]):
                 xy = d[d[:,0] == f][:,1:3]
-                r.append(xy[0])
-            
-            msd.append(msd_fft(np.asarray(r)))
+                if not bool(len(xy)):
+                    print(f'flag {f} not found in frame {i}')
+                    calculate = False
+                    break
+                else:
+                    r.append(xy[0])
+            if calculate:
+                msd.append(msd_fft(np.asarray(r)))
         else:
             xy = data[data.flag == f][['x','y']].values.astype(float)
             msd.append(msd_fft(xy))

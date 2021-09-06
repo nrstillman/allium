@@ -3,6 +3,7 @@ import os
 import allium 
 import torch
 
+import random
 import pickle
 import json
 import time
@@ -26,9 +27,11 @@ def calculate_summary_statistics(output, log=False):
     Ly = output['params']['Ly']
 
     #Eventually from SAMOSA - for now, look at following three:
-    msd = allium.ss.calculate_msd(output["data"],tracers=True)
-    D = np.polyfit(np.log( np.array(output['time'][1:len(msd)]).astype(np.float)), np.log(msd[1:]), 1)[0]
-    xi = allium.ss.average_horizontal_displacement(output,tracers=True)
+    zap = 320
+    time = np.linspace(26560, 39840, (39840-26560)/83)
+    msd = allium.ss.calculate_msd(output["data"],tracers=True, beg=zap, end = len(output['data']))
+    D = np.polyfit(np.log(time[1:]), np.log(msd[1:]), 1)[0]
+    xi = allium.ss.average_horizontal_displacement(output["data"],tracers=True)
     deltaphi = allium.ss.change_in_phi(output)
     if not log:
         print(f'\n<x_i> = {xi}')
@@ -104,14 +107,16 @@ def simulation_wrapper(params):
     filename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}.p'    
 
     obs = allium.simulate.sim(params, log=True)
-    with open(filename,'wb') as f:
-        pickle.dump(obs, f)
+    save = random.uniform(0,1) < 0.0095
+    if save:
+        with open(filename,'wb') as f:
+            pickle.dump(obs, f)
 
     summstats = torch.as_tensor(calculate_summary_statistics(obs,log=True))
-
-    with open(filename,'wb') as f:
-        obs['ss'] = summstats
-        pickle.dump(obs, f)
+    if save:
+        with open(filename,'wb') as f:
+            obs['ss'] = summstats
+            pickle.dump(obs, f)
 
     return summstats
 
@@ -126,6 +131,9 @@ def main ():
     print(f"Completed in {toc - tic:0.4f} seconds")
     picklefile = open('testposterior.p', 'wb') 
     pickle.dump(posterior, picklefile)
+
+
+    print(f"Completed in {toc - tic:0.4f} seconds")
 
     return 0
 
