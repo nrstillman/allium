@@ -28,10 +28,10 @@ def average_horizontal_displacement(data, tracers=True, beg = 0, end = 319):
     # prefer to use tracers particles
     data = data[beg:end]
     if tracers:
-        t0_flag =  data[beg][data[beg][:,-1] == 1][:,0]
+        t0_flag =  data[0][data[0][:,-1] == 1][:,0]
     # only take original cells (note - some of these may have died? see condition below)
     else:
-        t0_flag =  data[beg][:,0]
+        t0_flag =  data[0][:,0]
 
     #Error check for missing flags ... TODO
     # tf_flag  = flags = data[-1][data[-1][:,-1] == 1][:,0]    
@@ -42,8 +42,8 @@ def average_horizontal_displacement(data, tracers=True, beg = 0, end = 319):
     indices = []
     dx = []
     for f in t0_flag:
-        tf=  data[end]
-        t0=  data[beg]
+        tf=  data[-1]
+        t0=  data[0]
         dx.append(np.abs(tf[tf[:,0] == f][:,1]  - t0[t0[:,0] == f][:,1]))
     return np.asarray(dx).mean() 
 

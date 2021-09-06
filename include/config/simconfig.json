@@ -2,7 +2,7 @@
     "outputfolder": "allium/data/sim/",
     "filename": "wound_healing",
     "output_time": 83, 
-    "output_type": "all",
+    "output_type": "none",
     "t_final": 39840, 
     "popdynfreq": 51,
     "zaptime": 26560, 

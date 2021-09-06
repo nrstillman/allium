@@ -28,7 +28,7 @@ def calculate_summary_statistics(output, log=False):
 
     #Eventually from SAMOSA - for now, look at following three:
     zap = 320
-    time = np.linspace(26560, 39840, (39840-26560)/83)
+    time = np.linspace(26560, 39840, int((39840-26560)/83))
     msd = allium.ss.calculate_msd(output["data"],tracers=True, beg=zap, end = len(output['data']))
     D = np.polyfit(np.log(time[1:]), np.log(msd[1:]), 1)[0]
     xi = allium.ss.average_horizontal_displacement(output["data"],tracers=True)
@@ -47,56 +47,6 @@ def init_prior(bounds ,num_dim = 3):
     prior_min = bounds[0]
     prior_max = bounds[1]
     return utils.torchutils.BoxUniform(low=torch.as_tensor(prior_min),high=torch.as_tensor(prior_max))
-
-def update_config(params,values,configfile):
-    global n
-    dicts = {}
-    values = [float(p) for p in values]
-    print(f"params = {values}")
-    for i,p in enumerate(params):
-            dicts[p] = values[i]
-
-    with open(configfile, 'r') as j:
-         config = json.loads(j.read())
-
-    for key, value in dicts.items():
-        try:
-            config[key][-2][-2] = value
-            config[key][-2][-1] = value
-            config[key][-1][-2] = value
-            config[key][-1][-1] = value
-        except: 
-            config[key][-2] = value
-            config[key][-1] = value
-
-    config['filename'] = f"run{n}"
-    config['outputfolder'] = f"data/sim/sample{n}/"
-    with open(f"include/config/samples/sample{n}.json", 'w') as f:
-        json.dump(config, f, indent=4)
-
-    return config['outputfolder'] + config['filename']
-
-def simulator(p):
-    """
-    Runs active Brownian particle simulator with parameters
-
-    """
-    config_template = "include/config/simconfig.json"
-    configfile = f'samples/sample{n}.json'
-    params = ["pairstiff","factive","tau"]
-
-    # update json with parameter values
-    filename = update_config(params, list(p),config_template)
-    folder = f"data/sim/sample{n}/"    
-    # # run simulator 
-    command = f"mkdir data/sim/sample{n} && cd simulator && ./cellsimulator "  + f'{configfile}'
-    subprocess.call(command, shell=True)
-    time.sleep(5)
-
-    output = allium.utils.load_sim(folder=folder, configfile='include/config/'+configfile)
-    command = f"cd ../ & rm -f ../sample{n}/*"
-    subprocess.call(command, shell=True)
-    return output
 
 def simulation_wrapper(params):
     """
@@ -120,7 +70,7 @@ def simulation_wrapper(params):
 
     return summstats
 
-def main ():
+def main():
     print('beginning run')
     #v0, k, tau = [30,150], [20,150], [1,10]
     tic = time.perf_counter()
