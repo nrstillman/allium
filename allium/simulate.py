@@ -22,7 +22,27 @@ def printOutput(t, tic, p, log=False):
         print("\033[9A")
     return 0
 
-def getPopulation(sim):
+def getData(sim, neighbours = False):
+    popidx = [i for i in range(sim.popSize())]
+    pop = sim.getPopulationId(capmd.VectorInt(popidx))
+    data = []
+    for p in list(pop): 
+        if sim.getParticle(p).getType() == 1:
+            data.append([sim.getParticle(p).getId(),sim.getParticle(p).getType(),sim.getParticle(p).getVelocity()])
+
+
+    popId = np.array(sim.getPopulationId(capmd.VectorInt(popidx))).reshape(len(popidx),1)
+    popPosn = np.array(sim.getPopulationPosition(capmd.VectorInt(popidx)))
+    popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx))).reshape(len(popidx),1)
+    popArray = np.append(popId,popPosn,axis=1)
+    popArray = np.append(popArray,popType, axis=1)
+    if neighbours:
+        popPosn = np.array(sim.getPopulationPosition(capmd.VectorInt(popidx)))
+        popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx))).reshape(len(popidx),1)
+        
+    return popArray
+
+def getPopulation(sim, neighbours = False):
     pop = sim.popSize()
     popidx = []
     for i in range(pop): 
@@ -33,6 +53,9 @@ def getPopulation(sim):
     popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx))).reshape(len(popidx),1)
     popArray = np.append(popId,popPosn,axis=1)
     popArray = np.append(popArray,popType, axis=1)
+    if neighbours:
+        print('currently not implemented')
+        #get neighbours here
     return popArray
 
 def updateParams(p, params,log=False):
@@ -121,6 +144,63 @@ def sim(p = [], log=False):
             d[att] =  getattr(params,att)
 
     return {'data':popArray, 'params':d, 'time':timesteps, 'dt':timesteps[1] - timesteps[0]}
+
+def sim_neighbours(p = [], log=False):
+    if log:
+        print(f"# of parameters = {len(p)}", file=open('log.txt', 'a'))
+    else:
+        print(f"# of parameters = {len(p)}")
+    tic = time.perf_counter()
+    tic2 = time.perf_counter()
+    parameterFile = "include/config/simconfig_neighbours.json"
+    params = paramsFromFile(capmd.Parameters(), parameterFile)
+    params = updateParams(p, params,log)
+    sim = capmd.interface(params)
+    timesteps = []
+    x = []
+    Rlength = params.Lx/4
+    maxR = [ Rlength/2,  params.Ly]
+    minR = [-Rlength/2, -params.Ly]
+    popArray = []
+    for t in range(params.t_final):
+        sim.move()
+        # Test for output
+        if (t % params.output_time == 0):            
+            p = getPopulation(sim)   
+            printOutput(t, [tic, tic2], p,log)
+            popArray.append(p)         
+            if (params.output_type == 'all'):
+                sim.saveData("text")
+                sim.saveData("vtp")
+            else:
+                sim.saveData(params.output_type)            
+            tic2 = time.perf_counter()
+            timesteps.append(t)
+
+        # Test for scratch
+        if (t == params.zaptime):
+            p = getPopulation(sim)            
+            zapList = []
+            for i in range(sim.popSize()):
+                x = sim.getPopulationPosition(capmd.VectorInt([i]))[0]
+                if ((x[0] < maxR[0]) & (x[0] > minR[0])):
+                    if ((x[1] < maxR[1]) & (x[1] > minR[1])):
+                        idx = sim.getPopulationId(capmd.VectorInt([i]))[0]
+                        zapList.append(idx)
+            
+            sim.killCells(capmd.VectorInt(zapList))
+            print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="")
+        # Test for population dynamicss
+        if (t % params.popdynfreq == 0): 
+            sim.populationDynamics(params.popdynfreq)
+        
+    d = {}
+    for att in dir(params):
+        if not(att.startswith('__')):
+            d[att] =  getattr(params,att)
+
+    return {'data':popArray, 'params':d, 'time':timesteps, 'dt':timesteps[1] - timesteps[0]}
+
 
 if __name__ == "__main__":
     traj = sim()

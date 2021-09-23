@@ -52,7 +52,6 @@ def load_exp(folder = '../cell_track/segmenting/slow/*.csv', configfile = '../ce
         celltype = np.in1d(d[:,0],tracers)*1
         data[i] = np.append(d,celltype.reshape(len(d),1), axis=1)
 
-
     return data, output
 
 def read_output(f):

@@ -1,1 +1,11 @@
 log.txt
+
+cell_sim/
+data/
+output/
+sbi-logs/
+simulator/
+testposterior.p
+tmp.csv
+to_silke/
+

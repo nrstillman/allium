@@ -57,7 +57,7 @@ def simulation_wrapper(params):
     filename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}.p'    
 
     obs = allium.simulate.sim(params, log=True)
-    save = random.uniform(0,1) < 0.0095
+    save = True#random.uniform(0,1) < 0.0095
     if save:
         with open(filename,'wb') as f:
             pickle.dump(obs, f)
