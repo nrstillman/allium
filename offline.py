@@ -74,7 +74,6 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
                      float(f.split('_')[3]),\
                      float(f.split('_')[5].split('.')[0])]  
 
-
             x = simulatorloader(theta, final_time = final_time, \
                             summstats = summstats, tracers = tracers)
             if summstats:
@@ -114,7 +113,7 @@ def main():
     # Number of output files to use
     nfiles = 10
     # whether to use preloaded summary statistics (ss) or trajectories
-    summstats = False
+    summstats = True
     # whether to use all trajectories or just tracer particles
     tracers = True
     # Number of timesteps to use (zap occurs at 319) - only used if summstats = False
