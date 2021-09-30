@@ -116,10 +116,12 @@ def main():
     # whether to use preloaded summary statistics (ss) or trajectories
     summstats = False
     # whether to use all trajectories or just tracer particles
-    tracers = False
+    tracers = True
     # Number of timesteps to use (zap occurs at 319) - only used if summstats = False
-    final_time = 319 
+    final_time = 320
 
+    if tracers and final_time > 320: print('NOTE! zap at 320 means tracers are lost and referencing doesnt work')
+    
     #observed summary statistic for theta = [98, 97, 7] <- used for testing posterior
     point = [[98,97,7]]
     x_o = 5.5062e-01,  5.0076e+01, -5.6172e-03
