@@ -1,16 +1,15 @@
 # script for running sbi without simulations
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
-import torch.nn as nn 
-import torch.nn.functional as F 
-from sbi import utils
-from sbi import analysis
-from sbi import inference
-from sbi.inference import SNPE, simulate_for_sbi, prepare_for_sbi
-
 import pickle
 import os 
+
+#special numpy for neural networks
+import torch
+#neural network architecture for inference
+from sbi.inference import SNPE
+#only used to make pairplots
+from sbi import analysis
 
 def simulatorloader(theta, final_time = 480, path = 'output/', summstats = True, tracers = False):
     file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
