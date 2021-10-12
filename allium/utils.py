@@ -6,12 +6,12 @@ import json
 import btrack
 import napari #prefer to drop this in the future
 
-def load_exp(folder = '../cell_track/segmenting/slow/*.csv', configfile = '../cell_track/cell_config.json'):
+def load_exp(filenumber = 1, folder = '../cell_track/segmenting/slow/*.csv', configfile = '../cell_track/cell_config.json'):
     files = glob.glob(folder)
     if len(files) == 0:
         return('bad folder dir')
     else:
-        file = files[1]
+        file = files[filenumber]
     print(file)
     data =  pd.read_csv(file)
     segments = data[['ImageNumber',

@@ -13,6 +13,7 @@ from sbi import analysis
 
 def simulatorloader(theta, final_time = 480, path = 'output/', summstats = True, tracers = False):
     file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
+
     with open(path + file, 'rb') as f:
         sim = pickle.load(f)
 
@@ -53,7 +54,7 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
             ss2 = np.linalg.norm(get_trajs(3950,data)[:,1:3], axis=1).mean()
             ss3 = np.linalg.norm(get_trajs(3990,data)[:,1:3], axis=1).mean()
 
-            return torch.as_tensor([ss1,ss2,ss3])
+            return torch.as_tensor([ss1,ss2])
 
     # get all output files in path
     runs = os.listdir(path)
@@ -106,11 +107,12 @@ def plot_posterior(posterior, x_o, points):
     plt.show()
     return 0 
 
-def main():
+def main(post_file = ''):
+
     path = 'output/'
 
     # Number of output files to use
-    nfiles = 10
+    nfiles = 239
     # whether to use preloaded summary statistics (ss) or trajectories
     summstats = True
     # whether to use all trajectories or just tracer particles
@@ -118,35 +120,40 @@ def main():
     # Number of timesteps to use (zap occurs at 319) - only used if summstats = False
     final_time = 320
 
-    if tracers and final_time > 320: print('NOTE! zap at 320 means tracers are lost and referencing doesnt work')
+    if tracers and final_time > 320: print('NOTE! zap at 320 means tracers may be lost and referencing doesnt work')
     
     #observed summary statistic for theta = [98, 97, 7] <- used for testing posterior
     point = [[98,97,7]]
     x_o = 5.5062e-01,  5.0076e+01, -5.6172e-03
 
-    #Load presimulated data (saved in path)
-    print('Loading data')
-    sim_x, sim_theta = dataloader(summstats = summstats, tracers = tracers, nfiles = nfiles, final_time = final_time)
+    if len(post_file) > 0:     
+        with open('old_posteriors/' + post_file, 'rb') as f:
+            posterior = pickle.load(f)
+    else:
+        #Load presimulated data (saved in path)
+        print('Loading data')
+        sim_x, sim_theta = dataloader(summstats = summstats, tracers = tracers, nfiles = nfiles, final_time = final_time)
 
-    # Setup the inference procedure using a sequential neural posterior estimator SNPE
-    # The neural network here is a mixture density network (mdn) which combines gaussians, 
-    # also possible to try a type of normalising flow - masked autoregressive flow (maf)
-    inference = SNPE(prior=None, density_estimator = 'mdn')
+        # Setup the inference procedure using a sequential neural posterior estimator SNPE
+        # The neural network here is a mixture density network (mdn) which combines gaussians, 
+        # also possible to try a type of normalising flow - masked autoregressive flow (maf)
+        inference = SNPE(prior=None, density_estimator = 'maf')
 
-    # Recast theta and x as appropriate types for the estimator
-    theta = torch.as_tensor(sim_theta)
-    x = torch.stack(sim_x)
+        # Recast theta and x as appropriate types for the estimator
+        theta = torch.as_tensor(sim_theta)
+        x = torch.stack(sim_x)
 
-    #Append data to the inference engine (defined above) and train
-    print('\nTraining neural density estimator')
-    density_estimator = inference.append_simulations(theta, x).train()
+        #Append data to the inference engine (defined above) and train
+        print('\nTraining neural density estimator')
+        density_estimator = inference.append_simulations(theta, x).train()
 
-    #Build the posterior using the neural network 
-    posterior = inference.build_posterior(density_estimator)
+        #Build the posterior using the neural network 
+        posterior = inference.build_posterior(density_estimator)
 
     #Plot the posterior, highlighting an example summary statistic (x_o) and parameter combination (point)
     plot_posterior(posterior, x_o, points = point )
     return 0 
 
 if __name__ == "__main__":
-    main()
+    p = ''#'confluentpost.p'
+    main(post_file = p)

@@ -1,5 +1,6 @@
 import sys
-sys.path.append('simulator/') # This will be replaced by a called function in later releases
+# This will be replaced by a called function in later releases
+sys.path.append('simulator/') 
 
 import json
 import time
@@ -48,13 +49,18 @@ def getPopulation(sim, neighbours = False):
     for i in range(pop): 
         popidx.append(i)
 
-    popId = np.array(sim.getPopulationId(capmd.VectorInt(popidx))).reshape(len(popidx),1)
+    popId = np.array(sim.getPopulationId(capmd.VectorInt(popidx)))
     popPosn = np.array(sim.getPopulationPosition(capmd.VectorInt(popidx)))
-    popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx))).reshape(len(popidx),1)
-    popArray = np.append(popId,popPosn,axis=1)
-    popArray = np.append(popArray,popType, axis=1)
+    popVel = np.array(sim.getPopulationVelocity(capmd.VectorInt(popidx)))
+    popRadius = np.array(sim.getPopulationRadius(capmd.VectorInt(popidx)))
+    popTheta = np.array(sim.getPopulationTheta(capmd.VectorInt(popidx)))
+    popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx)))
+    popArray = np.stack([popId,popPosn[:,0], popPosn[:,1],
+                         popVel[:,0], popVel[:,1],
+                         popRadius, popTheta,popType], axis=1)
+
     if neighbours:
-        print('currently not implemented')
+        print('Error: currently not implemented')
         #get neighbours here
     return popArray
 
@@ -142,8 +148,8 @@ def sim(p = [], log=False):
     for att in dir(params):
         if not(att.startswith('__')):
             d[att] =  getattr(params,att)
-
-    return {'data':popArray, 'params':d, 'time':timesteps, 'dt':timesteps[1] - timesteps[0]}
+        
+    return Data(params=output['params'], data=output['data'], loadtimes = [0,params.t_final])
 
 def sim_neighbours(p = [], log=False):
     if log:
