@@ -29,6 +29,7 @@ def calculate_summary_statistics(output, log=False):
     #Eventually from SAMOSA - for now, look at following three:
     zap = 320
     time = np.linspace(26560, 39840, int((39840-26560)/83))
+    # time = np.linspace(0, 5700, 95)
     msd = allium.ss.calculate_msd(output["data"],tracers=True, beg=zap, end = len(output['data']))
     D = np.polyfit(np.log(time[1:]), np.log(msd[1:]), 1)[0]
     xi = allium.ss.average_horizontal_displacement(output["data"],tracers=True)
@@ -40,7 +41,7 @@ def calculate_summary_statistics(output, log=False):
             
     return [D, xi, deltaphi]
 
-def init_prior(bounds ,num_dim = 3):
+def init_prior(bounds ,num_dim = 3): 
     """
     Returns prior (currently 3-dimensional parameter space sampled w uniform)
     """
@@ -56,13 +57,13 @@ def simulation_wrapper(params):
     """
     filename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}.p'    
 
-    obs = allium.simulate.sim(params, log=True)
+    obs = allium.simulate.sim(params, log=False)
     save = True#random.uniform(0,1) < 0.0095
     if save:
         with open(filename,'wb') as f:
             pickle.dump(obs, f)
 
-    summstats = torch.as_tensor(calculate_summary_statistics(obs,log=True))
+    summstats = torch.as_tensor(calculate_summary_statistics(obs,log=False))
     if save:
         with open(filename,'wb') as f:
             obs['ss'] = summstats
@@ -72,10 +73,13 @@ def simulation_wrapper(params):
 
 def main():
     print('beginning run')
-    #v0, k, tau = [30,150], [20,150], [1,10]
-    tic = time.perf_counter()
+    #v0, k, tau = [30,150], [20,150], [1,10] <- parameter bounds
 
-    prior = init_prior([[30,20,1],[150,150,10]])
+    tic = time.perf_counter() # <- time keeping
+
+    #prior object must have sample attribute
+    prior = init_prior([[30,20,1],[150,150,10]]) # <- see higher def
+
     posterior = infer(simulation_wrapper, prior, method='SNPE', num_simulations=10, num_workers=4)
     toc = time.perf_counter()
     print(f"Completed in {toc - tic:0.4f} seconds")

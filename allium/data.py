@@ -4,7 +4,7 @@ class Parameters(object):
 		for key, values in p.items():
 			setattr(self, key, values)
 
-class Data:
+class SimData:
 	def checkTypes(readtypes,data):
 		#check which particles to load 
 		if len(readtypes) > 0:
@@ -44,12 +44,14 @@ class Data:
 		if self.multiopt:
 			self.Nsnap = self.end - self.start
 			#get maximum number of particles
-			self.N = 0
-			Nvals = []
+			self.N = sum(SimData.checkTypes(self.readtypes, kwargs['data'][0]))
+			self.Nvals = []
+			self.Nvariable =  False
 			for t in range(self.start,self.end):
-				Nvals.append(len(Data.checkTypes(self.readtypes, kwargs['data'][t])))
-				if Nvals[t] > self.N:
-					self.N = Nvals[t] 
+				self.Nvals.append(sum(SimData.checkTypes(self.readtypes, kwargs['data'][t])))
+				if self.Nvals[t] > self.N:
+					self.N = self.Nvals[t] 
+					self.Nvariable = True
 
 			self.flag=np.zeros((self.Nsnap,self.N))
 			self.rval=np.zeros((self.Nsnap,self.N,2))
@@ -62,7 +64,8 @@ class Data:
 
 			for t in range(self.start,self.end):
 				# only get particles we're interestsed in
-				usetypes = Data.checkTypes(self.readtypes, kwargs['data'][t])
+				usetypes = SimData.checkTypes(self.readtypes, kwargs['data'][t])
+				
 				idx = range(sum(usetypes))
 				#check whether data is old or new style
 				if kwargs['data'][t].shape[1] > 4:
@@ -74,7 +77,7 @@ class Data:
 					self.nval[t,idx,:] = np.array([np.cos(kwargs['data'][t][usetypes,5]), np.sin(kwargs['data'][t][usetypes,5])]).T
 					self.radius[t,idx] = kwargs['data'][t][usetypes,6]
 					self.ptype[t,idx] = kwargs['data'][t][usetypes,7]
-					self.sigma = np.mean(kwargs['data'][t][usetypes,6])
+					sigma = np.mean(kwargs['data'][t][usetypes,6])
 					if sigma>self.sigma:
 						self.sigma = sigma
 				else:
@@ -86,7 +89,8 @@ class Data:
 		# or a single snapshot
 		else:
 			# only get particles we're interestsed in
-			usetypes = Data.checkTypes(self.readtypes, kwargs['data'][t])
+			usetypes = SimData.checkTypes(self.readtypes, kwargs['data'])
+			self.Ntrack = sum(usetypes)
 			#check whether data is old or new style
 			if kwargs['data'].shape[1] > 4:
 				#new output includes v,theta,radius
@@ -110,4 +114,6 @@ class Data:
 				self.N = len(radius)
 				self.sigma = np.mean(radius)
 				print("New sigma is " + str(self.sigma))
-		
+
+	def gettypes(self, readtypes, frame):
+		return np.isin(self.ptype[frame],readtypes)

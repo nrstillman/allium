@@ -3,7 +3,8 @@
     "filename": "wound_healing",
     "output_time": 83, 
     "output_type": "none",
-    "t_final": 39840, 
+    "neighbour_print": 0,
+    "t_final": 26477, 
     "popdynfreq": 51,
     "zaptime": 26560, 
     

@@ -7,7 +7,7 @@ import time
 
 import numpy as np
 import pycapmd as capmd
-
+import allium
 def printOutput(t, tic, p, log=False):
     toc = time.perf_counter()
     message =  f"""-----------------------
@@ -149,7 +149,7 @@ def sim(p = [], log=False):
         if not(att.startswith('__')):
             d[att] =  getattr(params,att)
         
-    return Data(params=output['params'], data=output['data'], loadtimes = [0,params.t_final])
+    return allium.data.SimData(params=d, data=popArray, loadtimes = [0,int(params.t_final/params.output_time)])
 
 def sim_neighbours(p = [], log=False):
     if log:
