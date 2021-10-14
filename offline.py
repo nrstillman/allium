@@ -4,6 +4,9 @@ import numpy as np
 import pickle
 import os 
 
+import allium
+from scipy import stats
+
 #special numpy for neural networks
 import torch
 #neural network architecture for inference
@@ -13,7 +16,6 @@ from sbi import analysis
 
 def simulatorloader(theta, final_time = 480, path = 'output/', summstats = True, tracers = False):
     file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
-
     with open(path + file, 'rb') as f:
         sim = pickle.load(f)
 
@@ -34,27 +36,47 @@ def simulatorloader(theta, final_time = 480, path = 'output/', summstats = True,
             
             return new_data
         else:
-            return [sim['data'][ts] for ts in range(final_time)]
+            return sim
 
 def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420, 
                 nfiles = 10, summstats = True, tracers = False):
 
     print(f'\t summstats = {summstats},\n\t tracers = {tracers},\n\t number of files = {nfiles}')
 
-    def new_summarystatistic(data):
-            # fake new summary statistic which calculates the time averaged msd for 3 tracers particles 
-            def get_trajs(idx,data):
-                # gets trajectory of a particle
-                traj = []
-                for d in data:
-                    traj.append(d[d[:, 0] == idx])
-                return np.array(traj).reshape(final_time,4)
+    def new_summarystatistic(d):
+        """
+        Calculates summary statistics.
 
-            ss1 = np.linalg.norm(get_trajs(3900,data)[:,1:3], axis=1).mean()
-            ss2 = np.linalg.norm(get_trajs(3950,data)[:,1:3], axis=1).mean()
-            ss3 = np.linalg.norm(get_trajs(3990,data)[:,1:3], axis=1).mean()
+        """
+        takeDrift = True
 
-            return torch.as_tensor([ss1,ss2])
+        #just consider up to zap for now
+        d.truncateto(int(d.param.zaptime/d.param.output_time))
+
+        # # A - Velocity distributions and mean velocity
+        # # Bins are in normalised units (by mean velocity)
+        velbins=np.linspace(0,10,100)
+        velbins2=np.linspace(-10,10,100)
+        vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=[1],verbose=False)
+
+        # B - Autocorrelation Velocity Function
+        tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=False)
+
+        # C - Mean square displacement
+        tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=False)
+
+        # D - Self Intermediate Scattering Function
+        qval = 2*np.pi/1.0*np.array([1,0,0])
+        tval3, SelfInt = allium.summstats.SelfIntermediate(d, qval,True,usetype=[1],verbose=False)
+
+        ss = [vav[20:].mean(),
+              stats.kurtosis(vdist,fisher=False),vdist.mean(), vdist.var(),\
+              stats.kurtosis(vdist2,fisher=False),  vdist2.mean(),vdist2.var(),\
+              tval[velauto < 1e-2][0], v2av[20:].mean(), \
+              np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0]
+              ]
+                
+        return torch.as_tensor(ss)
 
     # get all output files in path
     runs = os.listdir(path)
@@ -101,7 +123,7 @@ def plot_posterior(posterior, x_o, points):
     posterior_samples = posterior.sample((10000,), x=x_o)
 
     # plot posterior samples
-    _ = analysis.pairplot(posterior_samples, limits=[[30,150],[20,150],[1,10]], 
+    _ = analysis.pairplot(posterior_samples, limits=[[1,150],[1,150],[1,20]], 
                         figsize=(5,5), labels=['v0', 'k', 'tau'], 
                         points = points,points_colors = 'r')
     plt.show()
@@ -112,19 +134,21 @@ def main(post_file = ''):
     path = 'output/'
 
     # Number of output files to use
-    nfiles = 239
+    nfiles = 17
     # whether to use preloaded summary statistics (ss) or trajectories
-    summstats = True
+    summstats = False
     # whether to use all trajectories or just tracer particles
-    tracers = True
+    tracers = False
     # Number of timesteps to use (zap occurs at 319) - only used if summstats = False
     final_time = 320
 
-    if tracers and final_time > 320: print('NOTE! zap at 320 means tracers may be lost and referencing doesnt work')
+    if tracers and final_time > 320: print('NOTE! scratch at 320 means tracers may be lost and referencing doesnt work')
     
     #observed summary statistic for theta = [98, 97, 7] <- used for testing posterior
-    point = [[98,97,7]]
-    x_o = 5.5062e-01,  5.0076e+01, -5.6172e-03
+    point = [[64,24,5]]
+    x_o = [16.202245763977825, 7.44145322651807, 0.1, 0.04474106773437495,\
+             11.20837708162953, 0.05, 0.01670146233886721, \
+             11.073605015673982, 436.8549410249958, 0.18990291714752636]
 
     if len(post_file) > 0:     
         with open('old_posteriors/' + post_file, 'rb') as f:
