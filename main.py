@@ -9,37 +9,51 @@ import json
 import time
 import subprocess
 import numpy as np
+from scipy import stats
 
 from sbi import utils as utils
 from sbi import analysis as analysis
+from sbi.inference import SNPE, prepare_for_sbi, simulate_for_sbi
 from sbi.inference.base import infer
+from sbi.utils.get_nn_models import posterior_nn
 import matplotlib.pyplot as plt
 
 
-def calculate_summary_statistics(output, log=False):
+def calculate_summary_statistics(d, log=False):
     """
     Calculates summary statistics.
 
-    In the future, this will include SAMoSA analysis 
-    Currently, calculates D from MSD, average horizontal distance, change in density
     """
-    Lx = output['params']['Lx']
-    Ly = output['params']['Ly']
+    takeDrift = True
+    start = 60
+    end = 320
+    # 0 is new cells, 1 is tracer, 2 is original (check this)
+    usetypes = [0,1,2]
+    end = int(d.param.zaptime/d.param.output_time) #320
+    # remove any data post zap
+    d.truncateto(start, end)
 
-    #Eventually from SAMOSA - for now, look at following three:
-    zap = 320
-    time = np.linspace(26560, 39840, int((39840-26560)/83))
-    # time = np.linspace(0, 5700, 95)
-    msd = allium.ss.calculate_msd(output["data"],tracers=True, beg=zap, end = len(output['data']))
-    D = np.polyfit(np.log(time[1:]), np.log(msd[1:]), 1)[0]
-    xi = allium.ss.average_horizontal_displacement(output["data"],tracers=True)
-    deltaphi = allium.ss.change_in_phi(output)
-    if not log:
-        print(f'\n<x_i> = {xi}')
-        print(f'\nD = {D}')
-        print(f'\n$\Delta\Phi$ = {deltaphi}\n\n\n\n')
+    # # # A - Velocity distributions and mean velocity
+    # # # Bins are in normalised units (by mean velocity)
+    velbins=np.linspace(0,10,100)
+    velbins2=np.linspace(-10,10,100)
+    vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=False)
+
+    # # B - Autocorrelation Velocity Function
+    tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=False)
+
+    # C - Mean square displacement
+    # offline until I talk to Silke
+    tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=False)
+
+    ss = [vav.mean(),
+          stats.kurtosis(vdist,fisher=False),vdist.mean(), vdist.var(),\
+          stats.kurtosis(vdist2,fisher=False),  vdist2.mean(),vdist2.var(),\
+          tval[velauto < 1e-2][0], \
+          np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0]
+          ]
             
-    return [D, xi, deltaphi]
+    return ss
 
 def init_prior(bounds ,num_dim = 3): 
     """
@@ -49,25 +63,29 @@ def init_prior(bounds ,num_dim = 3):
     prior_max = bounds[1]
     return utils.torchutils.BoxUniform(low=torch.as_tensor(prior_min),high=torch.as_tensor(prior_max))
 
-def simulation_wrapper(params):
+def simulation_wrapper(params, test=False, log = False):
     """
     Returns summary statistics from active particle model of cells.
 
     Summarizes the output of the simulator and converts it to `torch.Tensor`.
     """
     filename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}.p'    
+    if test:
+        theta = [64, 24, 5]
+        file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
+        with open( file, 'rb') as f:
+            obs = pickle.load(f)
 
-    obs = allium.simulate.sim(params, log=False)
-    save = True#random.uniform(0,1) < 0.0095
-    if save:
+    else:    
+        obs = allium.simulate.sim(params, log)
+    
+    save = random.uniform(0,1) < 1#0.01
+
+    if save and not test:
         with open(filename,'wb') as f:
             pickle.dump(obs, f)
 
-    summstats = torch.as_tensor(calculate_summary_statistics(obs,log=False))
-    if save:
-        with open(filename,'wb') as f:
-            obs['ss'] = summstats
-            pickle.dump(obs, f)
+    summstats = torch.as_tensor(calculate_summary_statistics(obs,log))
 
     return summstats
 
@@ -78,14 +96,28 @@ def main():
     tic = time.perf_counter() # <- time keeping
 
     #prior object must have sample attribute
-    prior = init_prior([[30,20,1],[150,150,10]]) # <- see higher def
+    prior = init_prior([[30,20,1],[150,150,10]]) # <- see higher definition
+    simulator, prior = prepare_for_sbi(simulation_wrapper, prior)
 
-    posterior = infer(simulation_wrapper, prior, method='SNPE', num_simulations=10, num_workers=4)
+    flow_density_estimator_build_fun = posterior_nn(model='maf', hidden_features=60, num_transforms=3)
+    mix_inference = SNPE( prior, density_estimator='mdn')
+    flow_inference = SNPE( prior, density_estimator=flow_density_estimator_build_fun)
+    
+    theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=1, num_workers = 1)
+    
+    flow_density_estimator = flow_inference.append_simulations(theta, x).train()
+    mix_density_estimator = mix_inference.append_simulations(theta, x).train()
+    
+    flow_posterior= flow_inference.build_posterior(flow_density_estimator) 
+    mix_posterior = mix_inference.build_posterior(mix_density_estimator)  
+    
     toc = time.perf_counter()
     print(f"Completed in {toc - tic:0.4f} seconds")
-    picklefile = open('testposterior.p', 'wb') 
-    pickle.dump(posterior, picklefile)
 
+    picklefile = open('mixposterior.p', 'wb') 
+    pickle.dump(mix_posterior, picklefile)
+    picklefile = open('flowposterior.p', 'wb') 
+    pickle.dump(flow_posterior, picklefile)
 
     print(f"Completed in {toc - tic:0.4f} seconds")
 
