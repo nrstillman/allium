@@ -381,7 +381,7 @@ def FourierTransVel(data,qmax=0.3,whichframe=1,usetype='all',verbose=True):
 def getVelcorrSingle(data,dx,xmax,whichframe=1,usetype='all',verbose=True):
 	# start with the isotropic one - since there is no obvious polar region
 	# and n is not the relevant variable, and v varies too much
-	print("Velocity correlation function for frame " + str(whichframe))
+	# print("Velocity correlation function for frame " + str(whichframe))
 	npts=int(round(xmax/dx))
 	bins=np.linspace(0,xmax,npts)
 	velcorr=np.zeros((npts,))
@@ -389,24 +389,31 @@ def getVelcorrSingle(data,dx,xmax,whichframe=1,usetype='all',verbose=True):
 	#index relevant particles (by default we use all of them)
 	useparts = data.gettypes(usetype,whichframe)
 	N = sum(useparts)
-	velav=np.sum(data.vval[whichframe,useparts,:],axis=0)/N
+	velav=np.mean(data.vval[whichframe,useparts,:],axis=0)
+
 	for k in range(N):
-		vdot=np.sum(data.vval[whichframe,useparts[k],:]*data.vval[whichframe,useparts,:],axis=1)
 		
+		vdot=np.dot(data.vval[whichframe,useparts,:],data.vval[whichframe,useparts,:][k])
+		
+		##Discretise spatially wrt particle distance 
 		#ApplyPeriodicBC and take norm
-		dr=np.linalg.norm(ApplyPeriodic2d(data, data.vval[whichframe,useparts,:] - data.vval[whichframe,useparts[k],:]))
+		dr = ApplyPeriodic2d(data, data.rval[whichframe,useparts,:]- data.rval[whichframe,useparts,:][k])
+		dr = np.linalg.norm(dr,axis=1)
+		#calculate number of bins
 		drbin=(np.round(dr/dx)).astype(int)
+		#binning velocity correlations based on interparticle distance
 		for l in range(npts):
 			pts=np.nonzero(drbin==l)[0]
 			velcorr[l]+=vdot[pts].sum()
 			velcount[l]+=len(pts)
-			
+	
 	isdata=[index for index, value in enumerate(velcount) if value>0]
-	velcorr[isdata]=velcorr[isdata]/velcount[isdata] - np.sum(velav*velav)
+	#connected correlation fcn
+	velcorr[isdata]=velcorr[isdata]/velcount[isdata] #- np.dot(velav,velav)
 	if verbose:
 		fig=plt.figure()
 		isdata=[index for index, value in enumerate(velcount) if value>0]
-		plt.plot(bins[isdata],velcorr[isdata],'.-r',lw=2)
+		plt.loglog(bins[isdata],velcorr[isdata],'.-r',lw=2)
 		#plt.show()
 		plt.xlabel("r-r'")
 		plt.ylabel('Correlation')

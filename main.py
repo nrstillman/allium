@@ -19,40 +19,70 @@ from sbi.utils.get_nn_models import posterior_nn
 import matplotlib.pyplot as plt
 
 
-def calculate_summary_statistics(d, log=False):
+def calculate_summary_statistics(d, log=False,start=60,end=320,takeDrift=False, plot = False):
     """
     Calculates summary statistics.
 
     """
-    takeDrift = True
-    start = 60
-    end = 320
     # 0 is new cells, 1 is tracer, 2 is original (check this)
     usetypes = [0,1,2]
     end = int(d.param.zaptime/d.param.output_time) #320
     # remove any data post zap
-    d.truncateto(start, end)
-
-    # # # A - Velocity distributions and mean velocity
-    # # # Bins are in normalised units (by mean velocity)
+    d.truncateto(starttime, endtime)
+    ss = {}
+    # # # # # A - Velocity distributions and mean velocity
     velbins=np.linspace(0,10,100)
     velbins2=np.linspace(-10,10,100)
-    vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=False)
-
+    vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=plot)
+    ss['vav'] = vav
+    ss['vdist'] = vdist
+    ss['vdist2'] = vdist2
     # # B - Autocorrelation Velocity Function
-    tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=False)
-
+    tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=plot)
+    ss['tval2'] = tval2
+    ss['velauto'] = velauto
+    ss['v2av'] = v2av
     # C - Mean square displacement
-    # offline until I talk to Silke
-    tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=False)
+    tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=plot)
+    ss['tval'] = tval
+    ss['msd'] = msd
+    # # D - Self Intermediate Scattering Function
+    qval = 2*np.pi/d.sigma*np.array([1,0])
+    tval3, SelfInt2, SelfInt = allium.summstats.SelfIntermediate(d, qval,takeDrift,usetype=[1],verbose=plot)
+    ss['tval3'] = tval3
+    ss['SelfInt2'] = SelfInt2
+    ss['SelfInt'] = SelfInt
 
-    ss = [vav.mean(),
-          stats.kurtosis(vdist,fisher=False),vdist.mean(), vdist.var(),\
-          stats.kurtosis(vdist2,fisher=False),  vdist2.mean(),vdist2.var(),\
-          tval[velauto < 1e-2][0], \
-          np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0]
-          ]
-            
+    step = 10
+    qmax = np.pi/d.sigma #particle size in wavelength (upper limit)
+    # qmax *= 0.5 #interested in lower q values
+    dx =  d.sigma#*0.5
+    xmax = d.param.Ly*d.sigma
+    ss['dx'] = dx
+    ss['xmax'] = xmax
+
+    # # E - real space velocity correlation function ('swirlyness')
+    velcorrReal = np.zeros((800,))
+    count = 0
+    for u in range(0,endtime - starttime,step):
+        # # # E - Real space velocity correlation function
+        spacebins,velcorr = allium.summstats.getVelcorrSingle(d, dx,xmax,whichframe=u,usetype=usetypes,verbose=plot)
+        velcorrReal[:len(spacebins)] += velcorr  
+
+        count+=1
+
+    velcorrReal/=count
+    ss['velcorrReal'] = velcorrReal
+    ss['spacebins'] = spacebins
+
+    ssvect = [vav.mean(),
+          stats.kurtosis(vdist,fisher=False),vdist.mean(),vdist.var(),\
+          stats.kurtosis(vdist2,fisher=False),vdist2.mean(),vdist2.var(),\
+          np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0], \
+          tval3[SelfInt2 < 0.5][0],\
+          tval2[velauto < 1e-1][0],\
+          np.polyfit(np.log(spacebins[50:400]), np.log(velcorrReal[50:400]), 1)[0]
+          ] 
     return ss
 
 def init_prior(bounds ,num_dim = 3): 
@@ -69,7 +99,7 @@ def simulation_wrapper(params, test=False, log = False):
 
     Summarizes the output of the simulator and converts it to `torch.Tensor`.
     """
-    filename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}.p'    
+    thetafilename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}'    
     if test:
         theta = [64, 24, 5]
         file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
@@ -79,13 +109,16 @@ def simulation_wrapper(params, test=False, log = False):
     else:    
         obs = allium.simulate.sim(params, log)
     
-    save = random.uniform(0,1) < 1#0.01
+    summstats = torch.as_tensor(calculate_summary_statistics(obs,log))
+
+    save = random.uniform(0,1) < 0.01
 
     if save and not test:
-        with open(filename,'wb') as f:
+        with open(thetafilename + '.p','wb') as f:
             pickle.dump(obs, f)
 
-    summstats = torch.as_tensor(calculate_summary_statistics(obs,log))
+        with open(thetafilename + '_ss.p','wb') as f:
+            pickle.dump(summstats, f)
 
     return summstats
 

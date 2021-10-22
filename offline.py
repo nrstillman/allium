@@ -43,91 +43,75 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
 
     print(f'\t summstats = {summstats},\n\t tracers = {tracers},\n\t number of files = {nfiles}')
 
-    def new_summarystatistic(d,theta):
+    def new_summarystatistic(d,theta,starttime=60, endtime=320,takeDrift=False,plot=False):
         """
         Calculates summary statistics.
 
         """
-        takeDrift = False
-        start = 60
-        end = 320
+                
+        takeDrift = False #< check this
+        plot = False
+        starttime = 60
+        endtime = 320
         # 0 is new cells, 1 is tracer, 2 is original (check this)
         usetypes = [0,1,2]
         end = int(d.param.zaptime/d.param.output_time) #320
         # remove any data post zap
-        d.truncateto(start, end)
-
-        # # # A - Velocity distributions and mean velocity
-        # # # Bins are in normalised units (by mean velocity)
+        d.truncateto(starttime, endtime)
+        ss = {}
+        # # # # # A - Velocity distributions and mean velocity
         velbins=np.linspace(0,10,100)
         velbins2=np.linspace(-10,10,100)
-        vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=False)
-
+        vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=plot)
+        ss['vav'] = vav
+        ss['vdist'] = vdist
+        ss['vdist2'] = vdist2
         # # B - Autocorrelation Velocity Function
-        tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=False)
-
+        tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=plot)
+        ss['tval2'] = tval2
+        ss['velauto'] = velauto
+        ss['v2av'] = v2av
         # C - Mean square displacement
-        tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=False)
-
-        # D - Self Intermediate Scattering Function
+        tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=plot)
+        ss['tval'] = tval
+        ss['msd'] = msd
+        # # D - Self Intermediate Scattering Function
         qval = 2*np.pi/d.sigma*np.array([1,0])
-        tval3, SelfInt2, SelfInt = allium.summstats.SelfIntermediate(d, qval,takeDrift,usetype=[1],verbose=False)
+        tval3, SelfInt2, SelfInt = allium.summstats.SelfIntermediate(d, qval,takeDrift,usetype=[1],verbose=plot)
+        ss['tval3'] = tval3
+        ss['SelfInt2'] = SelfInt2
+        ss['SelfInt'] = SelfInt
 
-        # step = 10
-        # #had to increase qmax to be greater than 
-        # qmax = 2*np.pi/10.0
+        step = 10
+        qmax = np.pi/d.sigma #particle size in wavelength (upper limit)
+        # qmax *= 0.5 #interested in lower q values
+        dx =  d.sigma#*0.5
+        xmax = d.param.Ly*d.sigma
+        ss['dx'] = dx
+        ss['xmax'] = xmax
 
-        # dq=2*np.pi/d.param.Lx
-        # nq=int(qmax/dq)
-        try:
-            t = tval2[velauto < 1e-2][0]
-        except:
-            print(theta)
-            print(tval2)
-        # # F - static structure factor
-        # structurefact = np.zeros((500,))
-        # # G - velocity correlation function in Fourier space
-        # velcorrFourier = np.zeros((500,))
-        # # H - real space velocity correlation function ('swirlyness')
-        # velcorrReal = np.zeros((150,))
-        # count = 0
-        # for u in range(0,end,step):
-        #     print(u)
-        #     # F - Static structure factor, i.e. the Fourier transform of g(r) = S(q)
-        #     # if don't use all then holes in structure
-        #     # qrad,valrad = FourierTrans(self,qmax=0.3,whichframe=1,usetype='all',L="default",verbose=True):
+        # # E - real space velocity correlation function ('swirlyness')
+        velcorrReal = np.zeros((800,))
+        count = 0
+        for u in range(0,endtime - starttime,step):
+            # # # E - Real space velocity correlation function
+            spacebins,velcorr = allium.summstats.getVelcorrSingle(d, dx,xmax,whichframe=u,usetype=usetypes,verbose=plot)
+            velcorrReal[:len(spacebins)] += velcorr  
 
-        #     qrad,valrad0 = allium.summstats.FourierTrans(d,qmax=qmax,whichframe=u,usetype=usetypes,verbose=True)
-        #     structurefact[:len(qrad)] += valrad0
+            count+=1
 
-        #     # G - Fourier space velocity correlation function
-        #     # better to use all to increase sample size
-        #     #qrad,valrad,Sqrad=FourierTransVel(self,qmax=0.3,whichframe=1,usetype='all',L="default",verbose=True)
-        #     qrad2,valrad0,Sqrad=allium.summstats.FourierTransVel(d,qmax=qmax,whichframe=u,usetype=usetypes,verbose=True)
-        #     velcorrFourier[:len(qrad2)] += Sqrad
-            
-        #     # H - Real space velocity correlation function
-        #     # better to use all to increase sample size
-        #     # requires periodic BC (difficult in applying to exp)
-        #     # bins,velcorr = getVelcorrSingle(self,dx,xmax,whichframe=1,usetype='all',verbose=True):
-        #     # spacing < 1 cell radius, out to 50 cell radii
-        #     spacebins,velcorr = allium.summstats.getVelcorrSingle(d, 0.5,50,whichframe=u,usetype=usetypes,verbose=True)
-        #     velcorrReal[:len(spacebins)] += velcorr
-            
-        #     count+=1
+        velcorrReal/=count
+        ss['velcorrReal'] = velcorrReal
+        ss['spacebins'] = spacebins
 
-        # structurefact/=count
-        # velcorrFourier/=count
-        # velcorrReal/=count
-
-        ss = [vav.mean(),
-              stats.kurtosis(vdist,fisher=False),vdist.var(),\
-              stats.kurtosis(vdist2,fisher=False),vdist2.var(),\
+        ssvect = [vav.mean(),
+              stats.kurtosis(vdist,fisher=False),vdist.mean(),vdist.var(),\
+              stats.kurtosis(vdist2,fisher=False),vdist2.mean(),vdist2.var(),\
               np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0], \
               tval3[SelfInt2 < 0.5][0],\
-                tval2[velauto < 1e-1][0],\
+              tval2[velauto < 1e-1][0],\
+              np.polyfit(np.log(spacebins[50:400]), np.log(velcorrReal[50:400]), 1)[0]
               ]
-                
         return torch.as_tensor(ss)
 
     # get all output files in path
@@ -197,8 +181,10 @@ def main(post_file = ''):
     if tracers and final_time > 320: print('NOTE! scratch at 320 means tracers may be lost and referencing doesnt work')
     
     #observed summary statistic for theta=
-    point = [[86,109,9]]
-    x_o  = [4.9340587898274215, 8.286965377696792, 0.09999999999999999, 0.05325610134735001, 12.597357502073766, 0.05000000000000001, 0.01952071604031606, 1.457746944004077]
+    point = [[98,71,4]]
+    x_o  = [8.610529135132671, 7.89438968534453, 0.09999999999999999, \
+            0.04974817367575438, 11.821959604501034, 0.05, 0.018131065407073408, \
+            1.4147876299837543, 0.49992277992278, 0.99984555984556]
     if len(post_file) > 0:     
         with open('old_posteriors/' + post_file, 'rb') as f:
             posterior = pickle.load(f)
@@ -210,7 +196,7 @@ def main(post_file = ''):
         # Setup the inference procedure using a sequential neural posterior estimator SNPE
         # The neural network here is a mixture density network (mdn) which combines gaussians, 
         # also possible to try a type of normalising flow - masked autoregressive flow (maf)
-        inference = SNPE(prior=None, density_estimator = 'mdn')
+        inference = SNPE(prior=None, density_estimator = 'maf')
 
         # Recast theta and x as appropriate types for the estimator
         theta = torch.as_tensor(sim_theta)
@@ -228,5 +214,5 @@ def main(post_file = ''):
     return 0 
 
 if __name__ == "__main__":
-    p = 'mixposterior.p'
+    p = ''#'mixposterior.p'
     main(post_file = p)
