@@ -31,7 +31,6 @@ def getData(sim, neighbours = False):
         if sim.getParticle(p).getType() == 1:
             data.append([sim.getParticle(p).getId(),sim.getParticle(p).getType(),sim.getParticle(p).getVelocity()])
 
-
     popId = np.array(sim.getPopulationId(capmd.VectorInt(popidx))).reshape(len(popidx),1)
     popPosn = np.array(sim.getPopulationPosition(capmd.VectorInt(popidx)))
     popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx))).reshape(len(popidx),1)
@@ -52,12 +51,12 @@ def getPopulation(sim, neighbours = False):
     popId = np.array(sim.getPopulationId(capmd.VectorInt(popidx)))
     popPosn = np.array(sim.getPopulationPosition(capmd.VectorInt(popidx)))
     popVel = np.array(sim.getPopulationVelocity(capmd.VectorInt(popidx)))
-    popRadius = np.array(sim.getPopulationRadius(capmd.VectorInt(popidx)))
     popTheta = np.array(sim.getPopulationTheta(capmd.VectorInt(popidx)))
+    popRadius = np.array(sim.getPopulationRadius(capmd.VectorInt(popidx)))
     popType = np.array(sim.getPopulationType(capmd.VectorInt(popidx)))
     popArray = np.stack([popId,popPosn[:,0], popPosn[:,1],
                          popVel[:,0], popVel[:,1],
-                         popRadius, popTheta,popType], axis=1)
+                         popTheta, popRadius ,popType], axis=1)
 
     if neighbours:
         print('Error: currently not implemented')

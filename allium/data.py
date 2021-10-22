@@ -115,15 +115,28 @@ class SimData:
 				self.sigma = np.mean(radius)
 				print("New sigma is " + str(self.sigma))
 
-	def gettypes(self, readtypes, frame):
-		return np.isin(self.ptype[frame],readtypes)
+	def gettypes(self, readtypes, frames):
+		return np.isin(self.ptype[frames],readtypes)
 
-	def truncateto(self, endtime):
-		self.Nsnap = endtime
-		self.flag =  self.flag[:endtime]
-		self.rval = self.rval[:endtime]
-		self.vval = self.vval[:endtime]
-		self.theta = self.theta[:endtime]
-		self.nval = self.nval[:endtime]
-		self.radius = self.radius[:endtime]
-		self.ptype = self.ptype[:endtime]
+		# if len(frames) > 0
+		# 	for t in frame
+		# 		idx = np.isin(self.ptype[t],readtypes):
+		# 		flag =  self.flag[t,idx,:]
+		# 		rval = self.rval[t,idx,:]
+		# 		vval = self.vval[t,idx,:]
+		# 		theta = self.theta[t,idx,:]
+		# 		nval = self.nval[t,idx,:]
+		# 		radius = self.radius[t,idx,:]
+		# 		ptype = self.ptype[t,idx,:]				
+		# else:
+		# 	return np.isin(self.ptype[frames],readtypes)
+
+	def truncateto(self,start, endtime):
+		self.Nsnap = endtime - start
+		self.flag =  self.flag[start:endtime]
+		self.rval = self.rval[start:endtime]
+		self.vval = self.vval[start:endtime]
+		self.theta = self.theta[start:endtime]
+		self.nval = self.nval[start:endtime]
+		self.radius = self.radius[start:endtime]
+		self.ptype = self.ptype[start:endtime]
