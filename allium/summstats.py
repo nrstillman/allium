@@ -377,7 +377,6 @@ def FourierTransVel(data,qmax=0.3,whichframe=1,usetype='all',verbose=True):
 # Real space velocity correlation function
 # Note that this can work in higher dimensions. Uses geodesic distance, i.e. on the sphere if necessary
 
-#use all <- doesn't look like it works... 
 def getVelcorrSingle(data,dx,xmax,whichframe=1,usetype='all',verbose=True):
 	# start with the isotropic one - since there is no obvious polar region
 	# and n is not the relevant variable, and v varies too much

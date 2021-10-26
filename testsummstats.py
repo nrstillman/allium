@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 #sqrt(k)*tau/zeta
 # very nearly flocking - correlates w system size
 
-with open('test_output/v0_98_k_71_tau_4.p', 'rb') as f:
+# with open('test_output/v0_130_k_85_tau_7.p', 'rb') as f:
+# with open('test_output/v0_106_k_76_tau_5.p', 'rb') as f:
+with open('test_output/v0_43_k_118_tau_7.p', 'rb') as f:
 	d = pickle.load(f)
 
 # use tracers
@@ -19,9 +21,16 @@ with open('test_output/v0_98_k_71_tau_4.p', 'rb') as f:
 # should be # of frames & # of tracers
 
 takeDrift = False #< check this
-plot = False
-starttime = 60
-endtime = 320
+plot = True
+scratch = True
+if scratch:
+    starttime = 321
+    endtime = 480
+else:
+    starttime = 60
+    endtime = 320
+
+
 # 0 is new cells, 1 is tracer, 2 is original (check this)
 usetypes = [0,1,2]
 end = int(d.param.zaptime/d.param.output_time) #320
@@ -60,8 +69,8 @@ qmax = np.pi/d.sigma #particle size in wavelength (upper limit)
 dq=2*np.pi/d.param.Ly #use smaller (for computation sake)
 nq=int(qmax/dq)
 
-dx =  d.sigma#*0.5
-xmax = d.param.Ly*d.sigma
+dx =  d.sigma
+xmax = d.param.Ly#*d.sigma
 ss['dx'] = dx
 ss['xmax'] = xmax
 
@@ -70,11 +79,17 @@ structurefact = np.zeros((500,))
 # # G - velocity correlation function in Fourier space
 velcorrFourier = np.zeros((500,))
 # # H - real space velocity correlation function ('swirlyness')
-velcorrReal = np.zeros((800,))
+velcorrReal = np.zeros((100,))
 count = 0
 plot = False
 # endtime - starttime
-for u in range(0,endtime - starttime,step):
+if scratch:
+    upperlimit = 150
+else:
+    upperlimit = 260    
+for u in range(0,upperlimit,step):
+    print(f"Velocity correlation function for frame {u}")
+
     # # # E - Real space velocity correlation function
     # # # better to use all to increase sample size
     # # # requires periodic BC (difficult in applying to exp)
@@ -119,26 +134,26 @@ velcorrFourier/=count
 # plt.title('Fourier space velocity correlation')
 
 #exponential
-# window = 80
-# plt.figure()
-# plt.plot(spacebins,velcorrReal[:window],'.-r',lw=2)
-# plt.xlabel('r')
-# plt.ylabel('correlation')
-# plt.title('Spatial velocity correlation')
+window = 80
+plt.figure()
+plt.plot(spacebins[:window],velcorrReal[:window],'.-r',lw=2)
+plt.xlabel('r')
+plt.ylabel('correlation')
+plt.title('Spatial velocity correlation')
 
-# plt.figure()
-# plt.semilogy(spacebins,velcorrReal[:window],'.-r',lw=2)
-# plt.xlabel('r')
-# plt.ylabel('correlation')
-# plt.title('Spatial velocity correlation')
-# plt.show()
+plt.figure()
+plt.semilogy(spacebins[:window],velcorrReal[:window],'.-r',lw=2)
+plt.xlabel('r')
+plt.ylabel('correlation')
+plt.title('Spatial velocity correlation')
+plt.show()
 
-# plt.figure()
-# plt.loglog(spacebins,velcorrReal[:window],'.-r',lw=2)
-# plt.xlabel('r')
-# plt.ylabel('correlation')
-# plt.title('Spatial velocity correlation')
-# plt.show()
+plt.figure()
+plt.loglog(spacebins[:window],velcorrReal[:window],'.-r',lw=2)
+plt.xlabel('r')
+plt.ylabel('correlation')
+plt.title('Spatial velocity correlation')
+plt.show()
 
 
 # # Self intermediate w single time scale, \ (PIV)
@@ -148,14 +163,18 @@ velcorrFourier/=count
 # # Autocorrelation @ 0.1\
 # #any correlation between particles approaches 0 (note, 1e-1 is due to fast drop off)
 # # persistance_time = tval2[velauto < 1e-1][0]
+x = spacebins[(50<spacebins) & (spacebins < 250)]
+y = velcorrReal[(50<spacebins) & (spacebins< 250)]
 
-ss = [vav.mean(),
+ssvect = [vav.mean(),
       stats.kurtosis(vdist,fisher=False),vdist.mean(),vdist.var(),\
       stats.kurtosis(vdist2,fisher=False),vdist2.mean(),vdist2.var(),\
       np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0], \
       tval3[SelfInt2 < 0.5][0],\
       tval2[velauto < 1e-1][0],\
-      np.polyfit(np.log(spacebins[50:400]), np.log(velcorrReal[50:400]), 1)[0]
+      np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0]
       ]
 
-print(f'{ss}')
+
+
+print(f'{ssvect}')

@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 import os 
-
 import allium
 from scipy import stats
 
@@ -14,14 +13,30 @@ from sbi.inference import SNPE
 #only used to make pairplots
 from sbi import analysis
 
+
 def simulatorloader(theta, final_time = 480, path = 'output/', summstats = True, tracers = False):
     file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
     with open(path + file, 'rb') as f:
         sim = pickle.load(f)
 
     if summstats:
-        return sim['ss']
+        with open(path + file[:-2] + '_ss.p', 'rb') as f:
+                ss = pickle.load(f)
 
+        x = ss['spacebins'][(50<ss['spacebins']) & (ss['spacebins'] < 250)]
+        y = ss['velcorrReal'][(50<ss['spacebins']) & (ss['spacebins']< 250)]
+        fit = np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0]
+        if np.isnan(fit):
+            return print('Error: cannot fit exponent')
+        ssvect = [ss['vav'].mean(),
+          stats.kurtosis(ss['vdist'],fisher=False),ss['vdist'].mean(),ss['vdist'].var(),\
+          stats.kurtosis(ss['vdist2'],fisher=False),ss['vdist2'].mean(),ss['vdist2'].var(),\
+          np.polyfit(np.log(ss['tval'][1:]), np.log(ss['msd'][1:]), 1)[0], \
+          ss['tval3'][ss['SelfInt2'] < 0.5][0],\
+          ss['tval2'][ss['velauto'] < 1e-1][0],\
+          fit
+          ]
+        return ssvect
     else:
         if tracers:
             # gets all tracer particles and returns array shaped as 
@@ -48,49 +63,29 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
         Calculates summary statistics.
 
         """
-                
-        takeDrift = False #< check this
-        plot = False
-        starttime = 60
-        endtime = 320
         # 0 is new cells, 1 is tracer, 2 is original (check this)
         usetypes = [0,1,2]
         end = int(d.param.zaptime/d.param.output_time) #320
         # remove any data post zap
         d.truncateto(starttime, endtime)
         ss = {}
-        # # # # # A - Velocity distributions and mean velocity
+        # A - Velocity distributions and mean velocity
         velbins=np.linspace(0,10,100)
         velbins2=np.linspace(-10,10,100)
         vav, vdist,vdist2 = allium.summstats.getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=plot)
-        ss['vav'] = vav
-        ss['vdist'] = vdist
-        ss['vdist2'] = vdist2
-        # # B - Autocorrelation Velocity Function
+        # B - Autocorrelation Velocity Function
         tval2, velauto, v2av = allium.summstats.getVelAuto(d, usetype=[1],verbose=plot)
-        ss['tval2'] = tval2
-        ss['velauto'] = velauto
-        ss['v2av'] = v2av
         # C - Mean square displacement
         tval, msd, d = allium.summstats.getMSD(d,takeDrift, usetype=[1],verbose=plot)
-        ss['tval'] = tval
-        ss['msd'] = msd
-        # # D - Self Intermediate Scattering Function
+        # D - Self Intermediate Scattering Function
         qval = 2*np.pi/d.sigma*np.array([1,0])
         tval3, SelfInt2, SelfInt = allium.summstats.SelfIntermediate(d, qval,takeDrift,usetype=[1],verbose=plot)
-        ss['tval3'] = tval3
-        ss['SelfInt2'] = SelfInt2
-        ss['SelfInt'] = SelfInt
 
         step = 10
         qmax = np.pi/d.sigma #particle size in wavelength (upper limit)
-        # qmax *= 0.5 #interested in lower q values
         dx =  d.sigma#*0.5
         xmax = d.param.Ly*d.sigma
-        ss['dx'] = dx
-        ss['xmax'] = xmax
-
-        # # E - real space velocity correlation function ('swirlyness')
+        # E - real space velocity correlation function ('swirlyness')
         velcorrReal = np.zeros((800,))
         count = 0
         for u in range(0,endtime - starttime,step):
@@ -101,8 +96,8 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
             count+=1
 
         velcorrReal/=count
-        ss['velcorrReal'] = velcorrReal
-        ss['spacebins'] = spacebins
+        x = spacebins[(50<spacebins) & (spacebins < 250)]
+        y = velcorrReal[(50<spacebins) & (spacebins< 250)]
 
         ssvect = [vav.mean(),
               stats.kurtosis(vdist,fisher=False),vdist.mean(),vdist.var(),\
@@ -110,14 +105,15 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
               np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0], \
               tval3[SelfInt2 < 0.5][0],\
               tval2[velauto < 1e-1][0],\
-              np.polyfit(np.log(spacebins[50:400]), np.log(velcorrReal[50:400]), 1)[0]
+              np.polyfit(np.log(x), np.log(y), 1)[0]
               ]
-        return torch.as_tensor(ss)
+
+        return [float(s) for s in  ssvect]
 
     # get all output files in path
     runs = os.listdir(path)
 
-    counter = 1
+    counter = 0
     # check if sim_theta/sim_x are already loaded
     if not bool(len(sim_x)):
         sim_theta = []
@@ -132,16 +128,18 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
                      float(f.split('_')[3]),\
                      float(f.split('_')[5].split('.')[0])]  
 
-            x = simulatorloader(theta, final_time = final_time, \
+            obs = simulatorloader(theta, final_time = final_time, \
                             summstats = summstats, tracers = tracers)
             if summstats:
                 #output from simulatorloader is summary statistics 
-                sim_x.append(x.float())
+                sim_x.append(obs)
+                # print(torch.tensor(obs))
+
             else:
                 #output from simulatorloader is all trajectories
                 # calculate new summary statistics using function above
-                x = new_summarystatistic(x,theta)
-                sim_x.append(x.float())
+                ss = new_summarystatistic(obs,theta)
+                sim_x.append(ss)
 
             sim_theta.append(theta)
             counter +=1
@@ -159,9 +157,10 @@ def plot_posterior(posterior, x_o, points):
     posterior_samples = posterior.sample((1000000,), x=x_o)
 
     # plot posterior samples
-    _ = analysis.pairplot(posterior_samples, limits=[[30,150],[20,50],[1,10]], 
+    _ = analysis.pairplot(posterior_samples, limits=[[30,150],[20,150],[1,10]], 
                         figsize=(5,5), labels=['v0', 'k', 'tau'], 
-                        points = points,points_colors = 'r')
+                        points = points,points_colors = 'r',
+                        title=f'theta = {points[0]} (maf)')
     plt.show()
     return 0 
 
@@ -170,9 +169,9 @@ def main(post_file = ''):
     path = 'output/'
 
     # Number of output files to use
-    nfiles = 22
+    nfiles = 50
     # whether to use preloaded summary statistics (ss) or trajectories
-    summstats = False
+    summstats = True
     # whether to use all trajectories or just tracer particles
     tracers = False
     # Number of timesteps to use (zap occurs at 319) - only used if summstats = False
@@ -180,11 +179,25 @@ def main(post_file = ''):
 
     if tracers and final_time > 320: print('NOTE! scratch at 320 means tracers may be lost and referencing doesnt work')
     
-    #observed summary statistic for theta=
-    point = [[98,71,4]]
-    x_o  = [8.610529135132671, 7.89438968534453, 0.09999999999999999, \
-            0.04974817367575438, 11.821959604501034, 0.05, 0.018131065407073408, \
-            1.4147876299837543, 0.49992277992278, 0.99984555984556]
+    #observed summary statistic for theta
+    # point = [[130,85,7]]
+    # x_o  = [10.619862140890774, 7.281318119420386, 0.09999999999999999, 
+    #         0.046286825048972746, 14.215249546296318, 0.05000000000000001, 
+    #         0.018488439758237423, 1.6700859307454134, 0.33328185328185334, 
+    #         6.165714285714286,  -1.3076073560018153]
+
+    # point = [[106,76,5]]
+    # x_o = [8.710863933824555, 7.006293753291603, 0.1,\
+    #      0.04575688259407634, 12.897090326037159, 0.05, \
+    #      0.017781969361675913, 1.5188451282881101, 0.41660231660231667,\
+    #       2.0830115830115834, -1.0103268536979177]
+
+    point = [[43,118,7]]
+    x_o = [2.4005848910622487, 7.192558655266788, 0.09999999999999999, \
+            0.04864900330486766, 13.807987463527866, 0.05, \
+            0.019013933524078055, 1.3440457369978542, 2.332972972972973, \
+            0.6665637065637067, -0.7472524105546924]
+
     if len(post_file) > 0:     
         with open('old_posteriors/' + post_file, 'rb') as f:
             posterior = pickle.load(f)
@@ -196,11 +209,11 @@ def main(post_file = ''):
         # Setup the inference procedure using a sequential neural posterior estimator SNPE
         # The neural network here is a mixture density network (mdn) which combines gaussians, 
         # also possible to try a type of normalising flow - masked autoregressive flow (maf)
-        inference = SNPE(prior=None, density_estimator = 'maf')
+        inference = SNPE(prior=None, density_estimator = 'mdn')
 
         # Recast theta and x as appropriate types for the estimator
         theta = torch.as_tensor(sim_theta)
-        x = torch.stack(sim_x)
+        x = torch.as_tensor(sim_x, dtype=torch.float32)
 
         #Append data to the inference engine (defined above) and train
         print('\nTraining neural density estimator')
@@ -211,8 +224,8 @@ def main(post_file = ''):
 
     #Plot the posterior, highlighting an example summary statistic (x_o) and parameter combination (point)
     plot_posterior(posterior, x_o, points = point )
-    return 0 
+    return posterior, x_o, point
 
 if __name__ == "__main__":
-    p = ''#'mixposterior.p'
-    main(post_file = p)
+    p = 'mdnposterior.p'
+    posterior, x_o, point = main(post_file = p)
