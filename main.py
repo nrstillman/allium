@@ -22,7 +22,7 @@ def main(args):
     prior = allium.utils.init_prior([args.thetamin, args.thetamax])
     
     posterior_opt = ['flow','mix']
-
+    print('Preparing simulator')
     #Prepare simulation object
     sim = allium.simulate.Sim(pmap = json.loads(args.thetadict),\
                     ssopts=args.summstatsopts,\
