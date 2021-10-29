@@ -15,11 +15,6 @@ import allium
 class Simulate(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
-        if self.test:
-            try:
-                print(f'test theta is {self.test_theta}')
-            except:
-                self.test_theta = [130, 85, 7]
         try:
             print(f'Parameter file loaded from {self.parameterFile}')
         except:
@@ -27,6 +22,15 @@ class Simulate(object):
 
         self.params = [p[1] for p in self.pmap.items()]
         self.keys = list(self.pmap.keys())
+        if self.test:
+            try:
+                print(f'test theta is {self.test_theta}')
+            except ValueError:
+                if len(self.keys) == 3:
+                    self.test_theta = [130, 85, 7]
+                else:
+                    print("No default parameters saved for this number of parameters. Set test parameters with test_theta")
+                    return 1 
 
     def wrapper(self, params):
         """
@@ -72,7 +76,6 @@ class Simulate(object):
         Main simulation function
 
         """
-
         def printOutput(t, tic, p, log=False):
             toc = time.perf_counter()
             message =  f"""-----------------------

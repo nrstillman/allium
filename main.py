@@ -1,5 +1,6 @@
 import time
 import os
+import argparse
 
 import allium 
 import torch
@@ -10,34 +11,15 @@ from datetime import *
 from sbi.inference import SNPE, prepare_for_sbi, simulate_for_sbi
 from sbi.utils.get_nn_models import posterior_nn
 
-def main(priormin, priormax):
+def main(args):
     """
     Basic call script for running cell migration inference using active brownian particle model
     """
     # Preparing simulations
-    #general options
-    log = False
-    test = True
-    save_prob = 0
-    nruns = 1000
-    nproc = 16
-    #io data
-    posterior_file = 'posterior'
-    posterior_folder = 'posteriors/5params/'
     if not os.path.exists(posterior_folder): os.makedirs(posterior_folder) 
-    outputfolder = 'output/5params/'
     if not os.path.exists(outputfolder): os.makedirs(outputfolder);os.makedirs(f'{outputfolder}/data');
-
-    # simulation data (inc parameter and ranges)
-    d = {'factive':'v0', 'pairstiff':'k', 'tau':'tau', 'divrate': 'a'}
-    priormin = [30,20,1, 4e-4]
-    priormax = [150,150,10, 8e-3]
-    prior = allium.utils.init_prior([priormin, priormax])
-    starttime = 0
-    endtime = 320    
-    # summary statistics to calculate
-    ssopts = ['A','B','C','D','E']
-    #posterior options
+    prior = allium.utils.init_prior([thetamin, thetamax])
+    
     posterior_opt = ['flow','mix']
 
     #Prepare simulation object
@@ -45,10 +27,10 @@ def main(priormin, priormax):
                     ssopts=ssopts,\
                     log=log, \
                     test=test, \
-                    folder=outputfolder, \
+                    folder=ofolder, \
                     save_prob=0, \
-                    starttime = 0, \
-                    endtime = 320)
+                    starttime = stime, \
+                    endtime = etime)
     simulator, prior = prepare_for_sbi(sim.wrapper, prior)
 
     # Running simulations
@@ -57,14 +39,13 @@ def main(priormin, priormax):
 
     theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=nruns, num_workers = nprocs)
     # Save parameter/observable data
-    try:
-        picklefile = open(f'{outputfolder}/data/run_{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}.p', 'wb') 
-    pickle.dump(mix_posterior, picklefile)
+    picklefile = open(f'{outputfolder}/data/run_{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}.p', 'wb') 
+    pickle.dump((theta,x), picklefile)
     toc = time.perf_counter()
     print(f"Completed simulations in {toc - tic:0.4f} seconds")
 
     # Run inference
-    if 'flow' in posterior_opt:
+    if 'flow' in popt:
         flow_density_estimator_build_fun = posterior_nn(model='maf', hidden_features=60, num_transforms=3)
         flow_inference = SNPE( prior, density_estimator=flow_density_estimator_build_fun)
         flow_density_estimator = flow_inference.append_simulations(theta, x).train()
@@ -72,7 +53,7 @@ def main(priormin, priormax):
         picklefile = open(f'{posterior_folder}/flow{posterior_file}.p', 'wb') 
         pickle.dump(flow_posterior, picklefile)
 
-    if 'mix' in posterior_opt:
+    if 'mix' in popt:
         mix_inference = SNPE( prior, density_estimator='mdn')
         mix_density_estimator = mix_inference.append_simulations(theta, x).train()
         mix_posterior = mix_inference.build_posterior(mix_density_estimator)  
@@ -85,11 +66,28 @@ def main(priormin, priormax):
     return 0
 
 if __name__ == "__main__":
-    #v0, k, tau = [30,150], [20,150], [1,10], [1,10], [0.0,1] <- parameter bounds
-    # additional:
-    #a = [4e-4, 8e-3] (reflects a/d0 of [0.01 to 0.2])
+    parser = argparse.ArgumentParser(description = 'Running cell migration inference using active brownian particle models and neural network approximators')
+    #general options
+    parser.add_argument('log', default = False,help='(bool) \nRefers to whether output should be saved to log.txt')
+    parser.add_argument('test', default = True,help='(bool)\nTesting summary statistics using previously saved file')
+    parser.add_argument('save_prob', default = 0, help='(float)\nProbability of saving file')
+    parser.add_argument('nruns', default = 1000, help='(int)\nNumber of simulations to run')
+    parser.add_argument('nproc', default = 16, help='(int)\nNumber of cores to use')
+    #io data
+    parser.add_argument('ofolder', default = 'output/', help='(str)\nFolder for data')
+    parser.add_argument('pfolder', default ='posteriors/', help='(str)\nFolder for posteriors')
+    parser.add_argument('pfile', default = 'posterior', help='(str)\nFilename for posteriors')
+    # simulation data (inc parameter and ranges) 
+    parser.add_argument('d', default = {'factive':'v0', 'pairstiff':'k', 'tau':'tau', 'divrate': 'a'}, help='(dict)\nDictionary mapping simulation parameters to passed parameters')
+    parser.add_argument('thetamin', default = [30,20,1, 4e-4],help='(list)\nList of lowerbound parameters values')
+    parser.add_argument('thetamax', default = [150,150,10, 8e-3], help='(list)\nList of upperbound parameters values')
+    parser.add_argument('stime', default = 0, help='(int)\nStarting frame number for summary statistics')
+    parser.add_argument('etime', default = 320, help='(int)\nFinal frame number for summary statistics')
+    # summary statistics to calculate
+    parser.add_argument('ssopts', default = ['A','B','C','D','E'], help='(list)\nSummary statistics to calculate (see allium/summstats.py for more details')
+    #posterior options
+    parser.add_argument('pcalc', default = True, help = '(bool)\nCalculating posterior based on simulation run')
+    parser.add_argument('popt', default = ['flow', 'mix'], help = '(list)\nList of posterior architectures to use')
+    args = parser.parse_args()
 
-    priormin = [30,20,1, 4e-4]
-    priormax = [150,150,10,8e-3]
-
-    main()
+    main(args)
