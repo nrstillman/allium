@@ -36,7 +36,7 @@ class Sim(object):
                 if len(self.keys) == 3:
                     self.test_theta = [130, 85, 7]
                 else:
-                    print("No default parameters saved for this number of parameters. Set test parameters with test_theta")
+                    print("ERROR: No default parameters saved for this number of parameters. Set test parameters with test_theta")
 
     def wrapper(self, params):
         """
@@ -45,14 +45,14 @@ class Sim(object):
         Summarizes the output of the simulator and converts it to `torch.Tensor`.
         """
 
-        thetafilename = f'{self.folder}/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}'    
+        thetafilename = f'{self.folder}/{self.run}_v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}'    
         if self.test:
             theta = self.test_theta
             try:
                 testout = self.test_folder
             except:
                 testout = 'test_output'
-            file = 'p'
+            file = f'{self.run}'
             for (p,t) in zip(self.params,theta):
                 file+= f'_{p}_{t}'
 
@@ -61,14 +61,13 @@ class Sim(object):
                 obs = pickle.load(f)
         else:    
             obs = self.simulate(params)
-            # obs = params
         save = random.uniform(0,1) < self.save_prob
         
         if save and not self.test:
             with open(thetafilename + '.p','wb') as f:
                 pickle.dump(obs, f)
 
-        ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.opts,log = self.log, starttime=self.starttime, endtime=self.endtime)
+        ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime, endtime=self.endtime)
 
         if save and not self.test:
             with open(thetafilename + '_ss.p','wb') as f:
