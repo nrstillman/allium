@@ -12,25 +12,31 @@ import numpy as np
 import pycapmd as capmd
 import allium
 
-class Simulate(object):
+class Sim(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
         try:
             print(f'Parameter file loaded from {self.parameterFile}')
         except:
             self.parameterFile = "include/config/simconfig.json"
+        #setting default values for testing simulation runs only 
+        if not hasattr(self,'params'):
+            self.params = []
+        if not hasattr(self,'pmap'):
+            self.pmap = {}
+        if not hasattr(self,'log'):
+            self.log = False
+        if not hasattr(self,'test'):
+            self.test = False
 
         self.params = [p[1] for p in self.pmap.items()]
         self.keys = list(self.pmap.keys())
         if self.test:
-            try:
-                print(f'test theta is {self.test_theta}')
-            except ValueError:
+            if not hasattr(self,'test_theta'):
                 if len(self.keys) == 3:
                     self.test_theta = [130, 85, 7]
                 else:
                     print("No default parameters saved for this number of parameters. Set test parameters with test_theta")
-                    return 1 
 
     def wrapper(self, params):
         """
@@ -54,9 +60,8 @@ class Simulate(object):
             with open( file, 'rb') as f:
                 obs = pickle.load(f)
         else:    
-            obs = sim(params, keys = self.keys, log = self.log)
-            print(params)
-            obs = params
+            obs = self.simulate(params)
+            # obs = params
         save = random.uniform(0,1) < self.save_prob
         
         if save and not self.test:
@@ -71,7 +76,7 @@ class Simulate(object):
 
         return torch.as_tensor(ssvect)
 
-    def sim(self):
+    def simulate(self, params):
         """
         Main simulation function
 
@@ -164,13 +169,13 @@ class Simulate(object):
                 return paramObj
     
         if self.log:
-            print(f"# of parameters = {len(p)}", file=open('log.txt', 'a'))
+            print(f"# of parameters = {len(params)}", file=open('log.txt', 'a'))
         else:
-            print(f"# of parameters = {len(p)}")
+            print(f"# of parameters = {len(params)}")
         tic = time.perf_counter()
         tic2 = time.perf_counter()
-        params = paramsFromFile(capmd.Parameters(), self.parameterFile)
-        params = updateParams(p, self.params,self.keys,self.log)
+        defaultparams = paramsFromFile(capmd.Parameters(), self.parameterFile)
+        params = updateParams(params, defaultparams,self.keys,self.log)
         sim = capmd.interface(params)
         timesteps = []
         x = []
@@ -183,7 +188,7 @@ class Simulate(object):
             # Test for output
             if (t % params.output_time == 0):            
                 p = getPopulation(sim)   
-                printOutput(t, [tic, tic2], p,log)
+                printOutput(t, [tic, tic2], p,self.log)
                 popArray.append(p)         
                 if (params.output_type == 'all'):
                     sim.saveData("text")

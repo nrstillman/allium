@@ -117,20 +117,7 @@ class SimData:
 
 	def gettypes(self, readtypes, frames):
 		return np.isin(self.ptype[frames],readtypes)
-
-		# if len(frames) > 0
-		# 	for t in frame
-		# 		idx = np.isin(self.ptype[t],readtypes):
-		# 		flag =  self.flag[t,idx,:]
-		# 		rval = self.rval[t,idx,:]
-		# 		vval = self.vval[t,idx,:]
-		# 		theta = self.theta[t,idx,:]
-		# 		nval = self.nval[t,idx,:]
-		# 		radius = self.radius[t,idx,:]
-		# 		ptype = self.ptype[t,idx,:]				
-		# else:
-		# 	return np.isin(self.ptype[frames],readtypes)
-
+		
 	def truncateto(self,start, endtime):
 		self.Nsnap = endtime - start
 		self.flag =  self.flag[start:endtime]
