@@ -64,7 +64,7 @@ def getPopulation(sim, neighbours = False):
     return popArray
 
 def updateParams(p, params,log=False):
-    keys = ['factive','pairstiff','tau']
+    keys = ['factive','pairstiff','tau','deathrate']
     setattr(params, 'log', log)
     if not bool(len(p)):
         print("No parameters updated")
@@ -77,6 +77,8 @@ def updateParams(p, params,log=False):
                 print(f'{key} = {value}\n')
             if key == 'pairstiff':
                 setattr(params, key, [[value,value,value],[value,value,value],[value,value,value]])
+            elif key == 'deathrate':
+                setattr(params, key, [value,0,value])
             else:
                 setattr(params, key, [value,value,value])
     return params

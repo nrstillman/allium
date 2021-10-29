@@ -8,9 +8,10 @@ import matplotlib.pyplot as plt
 #sqrt(k)*tau/zeta
 # very nearly flocking - correlates w system size
 
+with open('test_output/v0_43_k_118_tau_7.p', 'rb') as f:
 # with open('test_output/v0_130_k_85_tau_7.p', 'rb') as f:
 # with open('test_output/v0_106_k_76_tau_5.p', 'rb') as f:
-with open('test_output/v0_43_k_118_tau_7.p', 'rb') as f:
+# with open('output/4params/v0_116_k_135_tau_7_a_0.p', 'rb') as f:
 	d = pickle.load(f)
 
 # use tracers
@@ -22,7 +23,7 @@ with open('test_output/v0_43_k_118_tau_7.p', 'rb') as f:
 
 takeDrift = False #< check this
 plot = True
-scratch = True
+scratch = False
 if scratch:
     starttime = 321
     endtime = 480
@@ -163,6 +164,7 @@ plt.show()
 # # Autocorrelation @ 0.1\
 # #any correlation between particles approaches 0 (note, 1e-1 is due to fast drop off)
 # # persistance_time = tval2[velauto < 1e-1][0]
+velcorrReal = velcorrReal[:len(spacebins)]
 x = spacebins[(50<spacebins) & (spacebins < 250)]
 y = velcorrReal[(50<spacebins) & (spacebins< 250)]
 

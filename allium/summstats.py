@@ -98,7 +98,8 @@ def getMSD(data,takeDrift, usetype=[1],verbose=True):
 			gettracers = True
 			Nvariable= False
 	else:
-		Nvariable = True
+		Nvariable = False
+		gettracers = True
 
 	# Drift needs to work on tracers only (is this right?)
 	if takeDrift:
@@ -156,8 +157,7 @@ def getVelAuto(data,usetype=[1],verbose=True):
 		else:
 			gettracers = True
 			Nvariable= False
-	else:
-		Nvariable = True
+
 
 	# First compute normalised velocities. Note: normalised by mean velocity in the whole system at that time, not unit vectors!
 	Ntrack = sum(data.gettypes(usetype,0))
@@ -190,6 +190,7 @@ def SelfIntermediate(data,qval,takeDrift,usetype=[1],verbose=True, periodic=True
 	SelfInt=np.empty((data.Nsnap,),dtype=complex)
 	
 	# Get tracers
+	gettracers = True
 	if data.Nvariable:
 		if len(usetype) <1:
 			print("Error: Cannot calculate MSD when number of particles is changing")

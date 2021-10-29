@@ -101,22 +101,22 @@ def init_prior(bounds ,num_dim = 3):
     prior_max = bounds[1]
     return utils.torchutils.BoxUniform(low=torch.as_tensor(prior_min),high=torch.as_tensor(prior_max))
 
-def simulation_wrapper(params, test=True, log = False):
+def simulation_wrapper(params, test=False, log = False):
     """
     Returns summary statistics from active particle model of cells.
 
     Summarizes the output of the simulator and converts it to `torch.Tensor`.
     """
-    thetafilename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}'    
+    thetafilename = f'output/v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}_a_{int(params[3])}'    
     if test:
-        theta = [130, 85, 7]
-        file = f'test_output/v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
+        theta = [130, 85, 7, 0]
+        file = f'test_output/v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}_a_{theta[3]:g}.p'
         with open( file, 'rb') as f:
             obs = pickle.load(f)
     else:    
         obs = allium.simulate.sim(params, log)
     
-    save = random.uniform(0,1) < 1#0.01
+    save = random.uniform(0,1) < 0.02
     
     if save and not test:
         with open(thetafilename + '.p','wb') as f:
@@ -131,19 +131,24 @@ def simulation_wrapper(params, test=True, log = False):
 
 def main():
     print('beginning run')
-    #v0, k, tau = [30,150], [20,150], [1,10] <- parameter bounds
-
+    #v0, k, tau = [30,150], [20,150], [1,10], [1,10], [0.0,1] <- parameter bounds
+    # additional:
+    #a = [4e-4, 8e-3] (reflects a/d0 of [0.01 to 0.2])
+    # check before including whether this is with sqrt(dt) and realistic ranges
+    #align = []
     tic = time.perf_counter() # <- time keeping
 
     #prior object must have sample attribute
-    prior = init_prior([[30,20,1],[150,150,10]]) # <- see higher definition
+    # prior = init_prior([[30,20,1],[150,150,10]]) # <- see higher definition
+    #additional
+    prior = init_prior([[30,20,1, 4e-4],[150,150,10,8e-3]]) # <- see higher definition
     simulator, prior = prepare_for_sbi(simulation_wrapper, prior)
 
     flow_density_estimator_build_fun = posterior_nn(model='maf', hidden_features=60, num_transforms=3)
     mix_inference = SNPE( prior, density_estimator='mdn')
     flow_inference = SNPE( prior, density_estimator=flow_density_estimator_build_fun)
     
-    theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=3, num_workers = 1)
+    theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=1000, num_workers = 16)
     
     flow_density_estimator = flow_inference.append_simulations(theta, x).train()
     mix_density_estimator = mix_inference.append_simulations(theta, x).train()
