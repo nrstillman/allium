@@ -14,6 +14,27 @@ from sbi.inference import SNPE
 from sbi import analysis
 
 
+def plot_posterior(posterior, x_o, points):
+
+    posterior_samples = posterior.sample((1000000,), x=x_o)
+
+    if len(points[0]) == 3:
+        print('3params')
+        limits = [[30,150],[20,150],[1,10]]
+        labels = ['v0', 'k', 'tau']
+    elif len(points[0]) == 4:
+        print('4params')
+        limits = [[30,150],[20,150],[1,10], [4e-4,8e-3]]
+        labels = ['v0', 'k', 'tau', 'a']
+
+    # plot posterior samples
+    _ = analysis.pairplot(posterior_samples, limits=limits, 
+                        figsize=(5,5), labels=labels, 
+                        points = points,points_colors = 'r',
+                        title=f'theta = {points[0]} (mdn)')
+    plt.show()
+    return 0 
+
 def simulatorloader(theta, final_time = 480, path = 'output/', summstats = True, tracers = False):
     file = f'v0_{theta[0]:g}_k_{theta[1]:g}_tau_{theta[2]:g}.p'
     with open(path + file, 'rb') as f:
@@ -156,21 +177,6 @@ def dataloader(sim_x = [], sim_theta = [], path = 'output/', final_time = 420,
     
     return sim_x, sim_theta
 
-
-def plot_posterior(posterior, x_o, points):
-
-    posterior_samples = posterior.sample((1000000,), x=x_o)
-
-    limits = [[30,150],[20,150],[1,10]]
-    limits = [[30,150],[20,150],[1,10], [4e-4,8e-3]]
-    # plot posterior samples
-    _ = analysis.pairplot(posterior_samples, limits=limits, 
-                        figsize=(5,5), labels=['v0', 'k', 'tau', 'a'], 
-                        points = points,points_colors = 'r',
-                        title=f'theta = {points[0]} (mdn)')
-    plt.show()
-    return 0 
-
 def main(post_file = ''):
 
     path = 'output/3params/'
@@ -199,18 +205,14 @@ def main(post_file = ''):
     #      0.017781969361675913, 1.5188451282881101, 0.41660231660231667,\
     #       2.0830115830115834, -1.0103268536979177]
 
-    # point = [[43.144,118.356,7.517,0.004]]
-    # x_o = [2.4005848910622487, 7.192558655266788, 0.09999999999999999, \
-    #         0.04864900330486766, 13.807987463527866, 0.05, \
-    #         0.019013933524078055, 1.3440457369978542, 2.332972972972973, \
-    #         0.6665637065637067, -0.7472524105546924]
-
-    point = [[116.0106,135.285,7.431, 0.004]]
-    x_o = [5.200935743621611, 6.394764355570034, 0.09999999999999999, 0.04540955153904638, 12.606236836611926, 0.05000000000000001, 0.017565707151699105, 1.3432131589913003, 0.8332046332046333, 1.24980694980695, -0.698724718774916]
+    point = [[43.144,118.356,7.517]]
+    x_o = [2.4005848910622487, 7.192558655266788, 0.09999999999999999, \
+            0.04864900330486766, 13.807987463527866, 0.05, \
+            0.019013933524078055, 1.3440457369978542, 2.332972972972973, \
+            0.6665637065637067, -0.7472524105546924]
 
     if len(post_file) > 0:     
-        with open('posteriors/' + post_file, 'rb') as f:
-            posterior = pickle.load(f)
+  
     else:
         #Load presimulated data (saved in path)
         print('Loading data')
@@ -237,5 +239,5 @@ def main(post_file = ''):
     return posterior, x_o, point
 
 if __name__ == "__main__":
-    p = '4params/flowposterior.p'
+    p = '4params/flowposterior_4params.p'
     posterior, x_o, point = main(post_file = p)

@@ -20,12 +20,12 @@ def main(args):
     if not os.path.exists(args.outputfolder): 
         os.makedirs(args.outputfolder)
         os.makedirs(f'{outputfolder}/data');
-    prior = allium.utils.init_prior([args.thetamin, args.thetamax])
-    
+    d =json.loads(args.thetadict)
+    prior = allium.utils.init_prior([args.thetamin[:len(d)], args.thetamax[:len(d)]])
     posterior_opt = ['flow','mix']
     print('Preparing simulator')
     #Prepare simulation object
-    sim = allium.simulate.Sim(pmap = json.loads(args.thetadict),\
+    sim = allium.simulate.Sim(pmap = d,\
                     run = args.outputfile,\
                     ssopts=args.summstatsopts,\
                     log=args.log, \
@@ -84,13 +84,13 @@ if __name__ == "__main__":
     parser.add_argument('-pfi','--pfile', default = 'posterior', help='(str)\nFilename for posteriors')
     # simulation data (inc parameter and ranges) 
     parser.add_argument('-c', '--configfile', default = "include/config/simconfig.json")
-    parser.add_argument('-d', '--thetadict', type=str, default = {'factive':'v0', 'pairstiff':'k', 'tau':'tau', 'divrate': 'a'}, help='(dict)\nDictionary mapping simulation parameters to passed parameters')
-    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 4e-4],help='(list)\nList of lowerbound parameters values')
-    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 8e-3], help='(list)\nList of upperbound parameters values')
+    parser.add_argument('-d', '--thetadict', type=str, default = {'factive':'v0', 'pairstiff':'k', 'tau':'tau', 'deathrate': 'a'}, help='(dict)\nDictionary mapping simulation parameters to passed parameters')
+    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 4e-4,0],help='(list)\nList of lowerbound parameters values')
+    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 8e-3,1], help='(list)\nList of upperbound parameters values')
     parser.add_argument('-start','--starttime',type = int, default = 0, help='(int)\nStarting frame number for summary statistics')
     parser.add_argument('-end','--endtime',type = int, default = 320, help='(int)\nFinal frame number for summary statistics')
     # summary statistics to calculate
-    parser.add_argument('-ssopts','--summstatsopts', nargs = '+', default = ['A','B','C','D', 'E'], help='(list)\nSummary statistics to calculate (see allium/summstats.py for more details')
+    parser.add_argument('-ssopts','--summstatsopts', nargs = '+', default = ['A','B','C','D', 'E', 'F','G'], help='(list)\nSummary statistics to calculate (see allium/summstats.py for more details')
     #posterior options
     parser.add_argument('--pcalc', dest='pcalc', help = '(bool)\nCalculating posterior based on simulation run')
     parser.add_argument('--non-pcalc', dest='pcalc')

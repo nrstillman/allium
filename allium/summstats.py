@@ -10,7 +10,6 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
     """
     # 0 is new cells, 1 is tracer, 2 is original (check this)
     usetypes = [0,1,2]
-    end = int(d.param.zaptime/d.param.output_time) #320
     # remove any data post zap
     d.truncateto(starttime, endtime)
     ssdata = {}
@@ -82,24 +81,26 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         print('Finished calculating E. vel. corr. fcn')
         ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
 
+    if 'F' in opts:
+        # # F - Mean horizontal displacement
+        print('Finished calculating F. avg. horiz. disp.')
+        ssvect.append(deltax(d))
+
+    if 'G' in opts:
+        # # G - Change in density
+        print('Finished calculating G. change in phi')
+        ssvect.append(deltaphi(d))
+
     print('Finished calculating summary statistics')
     return ssvect, ssdata
 
-# utility function to get the partcles we want
-# Note: this can be a further subset of the ones we have read in, e.g. for tracer particles
-# including the 'do nothing' option for speed and convenience
-def getUseparts(data,usetype='all',frame=1):
-    if usetype == 'all':    
-        return range(data.Nval[frame])
-    else:
-        ptype = data.ptype[frame,:data.Nval[frame]]
-        useparts=[]
-        for v in range(len(ptype)):
-            if ptype[v] in usetype:
-                useparts.append(v)
-        if len(useparts)==0:
-            print("Configuration::getUseparts - Warning: no particles of the desired type(s) " + str(usetype))
-        return useparts
+def deltax(data,usetype=[1]):
+    tracers_start = data.gettypes(usetype,0)
+    tracers_end = data.gettypes(usetype,len(data.rval)-1)
+    return np.mean(data.rval[-1][tracers_end,0] - data.rval[0][tracers_start,0])
+    
+def deltaphi(data):
+    return (data.Nvals[-1] - data.Nvals[0])*(np.pi*data.param.R*data.param.R)/(data.param.Lx*data.param.Ly)        
 
 def ApplyPeriodic2d(data,dr):
     dr[:,0]-=data.param.Lx*np.round(dr[:,0]/data.param.Lx)
