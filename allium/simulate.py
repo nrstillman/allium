@@ -45,7 +45,9 @@ class Sim(object):
         Summarizes the output of the simulator and converts it to `torch.Tensor`.
         """
 
-        thetafilename = f'{self.folder}/{self.run}_v0_{int(params[0])}_k_{int(params[1])}_tau_{int(params[2])}'    
+        thetafilename = self.folder + self.run + '_'
+        for (a,b) in zip(list(self.pmap.keys()),params):
+            thetafilename+=f'{a}_{b:.1e}_'
         if self.test:
             theta = self.test_theta
             try:
@@ -64,14 +66,13 @@ class Sim(object):
         save = random.uniform(0,1) < self.save_prob
         
         if save and not self.test:
-            with open(thetafilename + '.p','wb') as f:
+            with open(thetafilename[:-1] + '.p','wb') as f:
                 pickle.dump(obs, f)
 
         ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime, endtime=self.endtime)
 
-        if save and not self.test:
-            with open(thetafilename + '_ss.p','wb') as f:
-                pickle.dump(ssdata, f)
+        with open(thetafilename + 'ss.p','wb') as f:
+            pickle.dump([ssdata, obs.param], f)
 
         return torch.as_tensor(ssvect)
 

@@ -3,13 +3,12 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False):
+def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [0,1,2]):
     """
     Calculates summary statistics.
 
     """
-    # 0 is new cells, 1 is tracer, 2 is original (check this)
-    usetypes = [0,1,2]
+    # 0 is new cells, 1 is tracer, 2 is original (check this)    
     # remove any data post zap
     d.truncateto(starttime, endtime)
     ssdata = {}
@@ -62,7 +61,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssvect.append(tval3[SelfInt2 < 0.5][0])
     if 'E' in opts:
         # # E - real space velocity correlation function ('swirlyness')
-        velcorrReal = np.zeros((100,))
+        velcorrReal = np.zeros((150,))
         count = 0
         for u in range(0,endtime - starttime,step):
             # # # E - Real space velocity correlation function
