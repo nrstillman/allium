@@ -4,6 +4,57 @@ class Parameters(object):
 		for key, values in p.items():
 			setattr(self, key, values)
 
+class ExperimentData:
+
+	def gettypes(self, readtypes, frames):
+		return np.isin(self.ptype[frames],readtypes)
+		
+	def truncateto(self,start, endtime):
+		self.Nsnap = endtime - start
+		self.Nvariable = False
+		self.flag =  self.flag[start:endtime]
+		self.rval = self.rval[start:endtime]
+		self.vval = self.vval[start:endtime]
+		# self.radius = self.radius[start:endtime]
+		self.ptype = self.ptype[start:endtime]
+
+	def __init__(self,data,properties):
+		class param:
+			def __init__(self):
+				self.Lx = 800
+				self.Ly = 800
+				self.R = 8
+				self.dt = 0.01
+				self.output_time = 83
+
+		self.param = param()
+		self.sigma = 8
+		self.umpp = 0.8
+		self.Nvals = [data[data[:,1] == n].shape[0] for n in range(properties['t'][-1])]
+		maxNcells = max(self.Nvals)
+
+		self.rval = np.zeros((properties['t'][-1]-1,maxNcells,2))
+		self.flag = np.zeros((properties['t'][-1]-1,maxNcells))
+		self.ptype = np.zeros((properties['t'][-1]-1,maxNcells))
+		d = []
+		tracers = []
+
+		for n in range(1,properties['parent'][-1]):
+			if len(data[data[:,0] == n]) == (properties['t'][-1]):
+				tracers.append(n)
+
+		for n in range(1,properties['t'][-1]):
+			Ncells = len(data[data[:,1] == n])
+			self.rval[n-1,:Ncells,:] = data[data[:,1] == n][:,2:]*self.umpp
+			self.flag[n-1,:Ncells] = data[data[:,1] == n][:,0]
+			self.ptype[n-1,:] = np.asarray([int(n in tracers) for n in self.flag[n-1]])
+
+
+		self.vval = np.zeros((properties['t'][-1]-2,maxNcells,2))
+		for n in range(0, properties['t'][-1]-3):
+			self.vval[n+1,self.ptype[n+1] == 1,:]  = (self.rval[n+1][self.ptype[n+1] == 1] - self.rval[n][self.ptype[n] == 1])*(self.param.output_time*self.param.dt )
+
+
 class SimData:
 	def checkTypes(readtypes,data):
 		#check which particles to load 

@@ -21,7 +21,7 @@ def main(args):
             print('saving data')
         sim = allium.simulate.Sim()
         obs = sim.simulate(args.theta)
-        ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime, endtime=self.endtime)
+        ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = args.summstatsopts,log = args.log, starttime=args.starttime, endtime=args.endtime)
         if args.save_prob == 1:
             picklefile = open(f'{args.outputfile}.p', 'wb') 
             pickle.dump(obs, picklefile)                    
@@ -32,14 +32,17 @@ def main(args):
     if not os.path.exists(args.posteriorfolder): os.makedirs(args.posteriorfolder) 
     if not os.path.exists(args.outputfolder): 
         os.makedirs(args.outputfolder)
-        os.makedirs(f'{outputfolder}/data');
+        os.makedirs(f'{args.outputfolder}/data');
     d =json.loads(args.thetadict)
-    prior = allium.utils.init_prior([args.thetamin[:len(d)], args.thetamax[:len(d)]])
+    thetamin = [float(t) for t in args.thetamin[:len(d)]]
+    thetamax = [float(t) for t in args.thetamax[:len(d)]]
+    prior = allium.utils.init_prior([thetamin, thetamax])
     posterior_opt = ['flow','mix']
     print('Preparing simulator')
     #Prepare simulation object
     sim = allium.simulate.Sim(pmap = d,\
                     run = args.outputfile,\
+                    parameterFile = args.configfile,\
                     ssopts=args.summstatsopts,\
                     log=args.log, \
                     test=args.test, \

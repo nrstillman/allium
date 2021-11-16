@@ -22,15 +22,19 @@ class Sim(object):
         #setting default values for testing simulation runs only 
         if not hasattr(self,'params'):
             self.params = []
+        else:
+            self.params = [p[1] for p in self.pmap.items()]        
         if not hasattr(self,'pmap'):
             self.pmap = {}
         if not hasattr(self,'log'):
             self.log = False
         if not hasattr(self,'test'):
             self.test = False
-
-        self.params = [p[1] for p in self.pmap.items()]
-        self.keys = list(self.pmap.keys())
+        if not hasattr(self,'pmap'):
+            self.keys = ['factive', 'pairstiff', 'tau', 'deathrate']    
+        else:
+            self.keys = list(self.pmap.keys())
+        
         if self.test:
             if not hasattr(self,'test_theta'):
                 if len(self.keys) == 3:
@@ -141,7 +145,7 @@ class Sim(object):
             if not bool(len(p)):
                 print("No parameters updated")
             else:
-                for key, value in zip(keys,p):
+                for key, value in zip(keys[:len(p)],p):                    
                     value = np.array(value)
                     if log:
                         print(f'{key} = {value}\n', file=open('log.txt', 'a'))
@@ -149,6 +153,10 @@ class Sim(object):
                         print(f'{key} = {value}\n')
                     if key == 'pairstiff':
                         setattr(params, key, [[value,value,value],[value,value,value],[value,value,value]])
+                    if key == 'pairatt':
+                        setattr(params, key, [[value,value,value],[value,value,value],[value,value,value]])
+                    elif key == 'N':
+                        setattr(params, key, value)
                     elif (key == 'deathrate') or (key == 'divrate'):
                         setattr(params, key, [value,0,value])
                     else:

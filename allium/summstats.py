@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import optimize
 from scipy import stats
 import matplotlib.pyplot as plt
 
@@ -36,7 +37,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['velauto'] = velauto
         ssdata['v2av'] = v2av
         print('Finished calculating B. autocorr vel fcn')
-        ssvect.append(tval2[velauto < 1e-1][0])
+        #ssvect.append(tval2[velauto < 5e-1][0])
     if 'C' in opts:
         # C - Mean square displacement
         tval, msd, d = getMSD(d,takeDrift, usetype=[1],verbose=plot)
@@ -44,6 +45,13 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['msd'] = msd
         print('Finished calculating C. MSD')
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0])
+        # ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
+        # ssvect.append(ssdata['msd'][-1])
+        v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),
+                                 xdata = tval[1:], ydata = msd[1:])[0]
+        # ssvect.append(v0)
+        # ssvect.append(tau)
+
     if 'D' in opts:     
         # # D - Self Intermediate Scattering Function
         qval = 2*np.pi/d.sigma*np.array([1,0])
@@ -71,6 +79,8 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
 
         velcorrReal = velcorrReal[:len(spacebins)]
         velcorrReal/=count
+        spacebins = spacebins[velcorrReal > 1]
+        velcorrReal = velcorrReal[velcorrReal > 1]
         ssdata['velcorrReal'] = velcorrReal
         ssdata['spacebins'] = spacebins
 
@@ -82,7 +92,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
 
     if 'F' in opts:
         # # F - Mean horizontal displacement
-        print('Finished calculating F. avg. horiz. disp.')
+        print('Finished calculating F. avg. horiz. disp. (from midway point)')
         ssvect.append(deltax(d))
 
     if 'G' in opts:
@@ -493,7 +503,7 @@ def getVelcorrSingle(data,dx,xmax,whichframe=1,usetype='all',verbose=True):
     
     isdata=[index for index, value in enumerate(velcount) if value>0]
     #connected correlation fcn
-    velcorr[isdata]=velcorr[isdata]/velcount[isdata] #- np.dot(velav,velav)
+    velcorr[isdata]=velcorr[isdata]/velcount[isdata] - np.dot(velav,velav)
     if verbose:
         fig=plt.figure()
         isdata=[index for index, value in enumerate(velcount) if value>0]
