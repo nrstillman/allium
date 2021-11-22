@@ -145,7 +145,7 @@ class Sim(object):
             if not bool(len(p)):
                 print("No parameters updated")
             else:
-                for key, value in zip(keys[:len(p)],p):                    
+                for key, value in zip(keys[:len(p)],p):                                        
                     value = np.array(value)
                     if log:
                         print(f'{key} = {value}\n', file=open('log.txt', 'a'))

@@ -178,3 +178,14 @@ class SimData:
 		self.nval = self.nval[start:endtime]
 		self.radius = self.radius[start:endtime]
 		self.ptype = self.ptype[start:endtime]
+
+	def spatialcut(self,minL=-400, maxL=400, dim=0):
+		for t in range(self.Nsnap):
+			cut_indices = (self.rval[t][:,dim] < minL) | (self.rval[t][:,dim] > maxL)
+			self.flag[t][cut_indices] = [0]
+			self.vval[t][cut_indices,:] = [0,0]
+			self.theta[t][cut_indices] = [0]
+			self.nval[t][cut_indices,:] = [0,0]
+			self.radius[t][cut_indices] = [0]
+			self.ptype[t][cut_indices] = [0]
+			self.rval[t][cut_indices,:] = [0,0]
