@@ -19,17 +19,21 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         velbins=np.linspace(0,10,100)
         velbins2=np.linspace(-10,10,100)
         vav, vdist,vdist2 = getVelDist(d, velbins,velbins2, usetype=usetypes,verbose=plot)
+        
+        vdist = vdist[1:]
+        vdist2 = vdist2[vdist2 != max(vdist2)]
+
         ssdata['vav'] = vav
         ssdata['vdist'] = vdist
         ssdata['vdist2'] = vdist2
         print('Finished calculating A. vel. dist & mean vel')
         ssvect.append(vav.mean()) 
-        ssvect.append(stats.kurtosis(vdist,fisher=False))
-        ssvect.append(vdist.mean())
-        ssvect.append(vdist.var())
-        ssvect.append(stats.kurtosis(vdist2,fisher=False))
-        ssvect.append(vdist2.mean())
-        ssvect.append(vdist2.var())
+        ssvect.append(stats.kurtosis(vdist[1:],fisher=False))
+        ssvect.append(vdist[1:].mean())
+        ssvect.append(vdist[1:].var())
+        ssvect.append(stats.kurtosis(vdist2[1:],fisher=False))
+        ssvect.append(vdist2[1:].mean())
+        ssvect.append(vdist2[1:].var())
     if 'B' in opts:
         # # B - Autocorrelation Velocity Function
         tval2, velauto, v2av = getVelAuto(d, usetype=[1],verbose=plot)
@@ -37,7 +41,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['velauto'] = velauto
         ssdata['v2av'] = v2av
         print('Finished calculating B. autocorr vel fcn')
-        #ssvect.append(tval2[velauto < 5e-1][0])
+        ssvect.append(tval2[velauto < 5e-1][0])
     if 'C' in opts:
         # C - Mean square displacement
         tval, msd, d = getMSD(d,takeDrift, usetype=[1],verbose=plot)
@@ -45,13 +49,11 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['msd'] = msd
         print('Finished calculating C. MSD')
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0])
-        # ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
-        # ssvect.append(ssdata['msd'][-1])
-        v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),
-                                 xdata = tval[1:], ydata = msd[1:])[0]
-        # ssvect.append(v0)
-        # ssvect.append(tau)
-
+        ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
+        ssvect.append(ssdata['msd'][-1])
+        #v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),xdata = tval[1:], ydata = msd[1:])[0]
+        #ssvect.append(v0)
+        #ssvect.append(tau)
     if 'D' in opts:     
         # # D - Self Intermediate Scattering Function
         qval = 2*np.pi/d.sigma*np.array([1,0])
@@ -66,7 +68,10 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['dx'] = dx
         ssdata['xmax'] = xmax
         print('Finished calculating D. self-intermediate scattering fcn')
-        ssvect.append(tval3[SelfInt2 < 0.5][0])
+        if np.sum(SelfInt2 < 0.5) > 0:
+            ssvect.append(tval3[SelfInt2 < 0.5][0])
+        else:
+            ssvect.append(tval3[-1])
     if 'E' in opts:
         # # E - real space velocity correlation function ('swirlyness')
         velcorrReal = np.zeros((150,))
@@ -79,8 +84,6 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
 
         velcorrReal = velcorrReal[:len(spacebins)]
         velcorrReal/=count
-        spacebins = spacebins[velcorrReal > 1]
-        velcorrReal = velcorrReal[velcorrReal > 1]
         ssdata['velcorrReal'] = velcorrReal
         ssdata['spacebins'] = spacebins
 
@@ -88,8 +91,10 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         y = velcorrReal[(50<spacebins) & (spacebins< 300)]
         
         print('Finished calculating E. vel. corr. fcn')
-        ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
-
+        if np.sum(y>0) > 0:
+            ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
+        else:
+            ssvect.append(0)
     if 'F' in opts:
         # # F - Mean horizontal displacement
         print('Finished calculating F. avg. horiz. disp. (from midway point)')
@@ -503,7 +508,7 @@ def getVelcorrSingle(data,dx,xmax,whichframe=1,usetype='all',verbose=True):
     
     isdata=[index for index, value in enumerate(velcount) if value>0]
     #connected correlation fcn
-    velcorr[isdata]=velcorr[isdata]/velcount[isdata] - np.dot(velav,velav)
+    velcorr[isdata]=velcorr[isdata]/velcount[isdata] #- np.dot(velav,velav)
     if verbose:
         fig=plt.figure()
         isdata=[index for index, value in enumerate(velcount) if value>0]

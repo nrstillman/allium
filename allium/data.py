@@ -24,12 +24,14 @@ class ExperimentData:
 				self.Lx = 800
 				self.Ly = 800
 				self.R = 8
-				self.dt = 0.01
+				self.dt = 0.001
 				self.output_time = 83
 
 		self.param = param()
 		self.sigma = 8
 		self.umpp = 0.8
+		self.framerate = 5
+
 		self.Nvals = [data[data[:,1] == n].shape[0] for n in range(properties['t'][-1])]
 		maxNcells = max(self.Nvals)
 
@@ -51,9 +53,9 @@ class ExperimentData:
 
 
 		self.vval = np.zeros((properties['t'][-1]-2,maxNcells,2))
-		for n in range(0, properties['t'][-1]-3):
-			self.vval[n+1,self.ptype[n+1] == 1,:]  = (self.rval[n+1][self.ptype[n+1] == 1] - self.rval[n][self.ptype[n] == 1])*(self.param.output_time*self.param.dt )
-
+		for n in range(0, properties['t'][-1]-2):
+			self.vval[n,self.ptype[n] == 1,:]  = (self.rval[n+1][self.ptype[n+1] == 1] - self.rval[n][self.ptype[n] == 1])
+			self.vval[n,self.ptype[n] == 1,:] *= (60/self.framerate) #converts from um/min to um/hour 
 
 class SimData:
 	def checkTypes(readtypes,data):

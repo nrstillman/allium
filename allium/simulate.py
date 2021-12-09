@@ -25,6 +25,7 @@ class Sim(object):
         else:
             self.params = [p[1] for p in self.pmap.items()]        
         if not hasattr(self,'pmap'):
+            print('no parameter map detected, using default')
             self.pmap = {}
         if not hasattr(self,'log'):
             self.log = False
@@ -153,7 +154,7 @@ class Sim(object):
                         print(f'{key} = {value}\n')
                     if key == 'pairstiff':
                         setattr(params, key, [[value,value,value],[value,value,value],[value,value,value]])
-                    if key == 'pairatt':
+                    elif key == 'pairatt':
                         setattr(params, key, [[value,value,value],[value,value,value],[value,value,value]])
                     elif key == 'N':
                         setattr(params, key, value)
