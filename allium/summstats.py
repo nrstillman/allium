@@ -28,12 +28,12 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['vdist2'] = vdist2
         print('Finished calculating A. vel. dist & mean vel')
         ssvect.append(vav.mean()) 
-        ssvect.append(stats.kurtosis(vdist[1:],fisher=False))
-        ssvect.append(vdist[1:].mean())
-        ssvect.append(vdist[1:].var())
-        ssvect.append(stats.kurtosis(vdist2[1:],fisher=False))
-        ssvect.append(vdist2[1:].mean())
-        ssvect.append(vdist2[1:].var())
+        ssvect.append(stats.kurtosis(vdist,fisher=False))
+        ssvect.append(vdist.mean())
+        ssvect.append(vdist.var())
+        ssvect.append(stats.kurtosis(vdist2,fisher=False))
+        ssvect.append(vdist2.mean())
+        ssvect.append(vdist2.var())
     if 'B' in opts:
         # # B - Autocorrelation Velocity Function
         tval2, velauto, v2av = getVelAuto(d, usetype=[1],verbose=plot)
@@ -105,6 +105,9 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         print('Finished calculating G. change in phi')
         ssvect.append(deltaphi(d))
 
+    if 'H' in opts:
+        ssvect.append(mean_vect_vel)
+
     print('Finished calculating summary statistics')
     return ssvect, ssdata
 
@@ -115,6 +118,9 @@ def deltax(data,usetype=[1]):
     
 def deltaphi(data):
     return (data.Nvals[-1] - data.Nvals[0])*(np.pi*data.param.R*data.param.R)/(data.param.Lx*data.param.Ly)        
+
+# def mean_vect_vel(datA):
+#     return 1/N(\sum v_x, \sum v_y)
 
 def ApplyPeriodic2d(data,dr):
     dr[:,0]-=data.param.Lx*np.round(dr[:,0]/data.param.Lx)
