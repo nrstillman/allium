@@ -29,6 +29,9 @@ class Sim(object):
             self.pmap = {}
         if not hasattr(self,'log'):
             self.log = False
+        if not hasattr(self,'nfeatures'):
+            self.nfeatures = 15
+
         if not hasattr(self,'test'):
             self.test = False
         if not hasattr(self,'pmap'):
@@ -43,12 +46,17 @@ class Sim(object):
                 else:
                     print("ERROR: No default parameters saved for this number of parameters. Set test parameters with test_theta")
 
+
     def wrapper(self, params):
         """
         Returns summary statistics from active particle model of cells.
 
         Summarizes the output of the simulator and converts it to `torch.Tensor`.
         """
+        def sig_handler(signum, frame):
+            print(f'Error: segfault w params {params}')
+
+        signal.signal(signal.SIGSEGV, sig_handler)
 
         thetafilename = self.folder + self.run + '_'
         for (a,b) in zip(list(self.pmap.keys()),params):
@@ -68,6 +76,9 @@ class Sim(object):
                 obs = pickle.load(f)
         else:    
             obs = self.simulate(params)
+            if obs == None:
+                return torch.as_tensor([0]*self.nfeatures)
+
         save = random.uniform(0,1) < self.save_prob
         
         if save and not self.test:
