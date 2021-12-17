@@ -26,7 +26,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['vav'] = vav
         ssdata['vdist'] = vdist
         ssdata['vdist2'] = vdist2
-        print('Finished calculating A. vel. dist & mean vel')
+        if log: print('Finished calculating A. vel. dist & mean vel')
         ssvect.append(vav.mean()) 
         ssvect.append(stats.kurtosis(vdist,fisher=False))
         ssvect.append(vdist.mean())
@@ -40,14 +40,14 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         ssdata['tval2'] = tval2
         ssdata['velauto'] = velauto
         ssdata['v2av'] = v2av
-        print('Finished calculating B. autocorr vel fcn')
+        if log: print('Finished calculating B. autocorr vel fcn') 
         ssvect.append(tval2[velauto < 5e-1][0])
     if 'C' in opts:
         # C - Mean square displacement
         tval, msd, d = getMSD(d,takeDrift, usetype=[1],verbose=plot)
         ssdata['tval'] = tval
         ssdata['msd'] = msd
-        print('Finished calculating C. MSD')
+        if log: print('Finished calculating C. MSD') 
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0])
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
         ssvect.append(ssdata['msd'][-1])
@@ -67,7 +67,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         xmax = d.param.Ly
         ssdata['dx'] = dx
         ssdata['xmax'] = xmax
-        print('Finished calculating D. self-intermediate scattering fcn')
+        if log: print('Finished calculating D. self-intermediate scattering fcn') 
         if np.sum(SelfInt2 < 0.5) > 0:
             ssvect.append(tval3[SelfInt2 < 0.5][0])
         else:
@@ -90,25 +90,25 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,start
         x = spacebins[(50<spacebins) & (spacebins < 300)]
         y = velcorrReal[(50<spacebins) & (spacebins< 300)]
         
-        print('Finished calculating E. vel. corr. fcn')
+        if log: print('Finished calculating E. vel. corr. fcn')
         if np.sum(y>0) > 0:
             ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
         else:
             ssvect.append(0)
     if 'F' in opts:
         # # F - Mean horizontal displacement
-        print('Finished calculating F. avg. horiz. disp. (from midway point)')
+        if log: print('Finished calculating F. avg. horiz. disp. (from midway point)')
         ssvect.append(deltax(d))
 
     if 'G' in opts:
         # # G - Change in density
-        print('Finished calculating G. change in phi')
+        if log: print('Finished calculating G. change in phi')
         ssvect.append(deltaphi(d))
 
     if 'H' in opts:
         ssvect.append(mean_vect_vel)
 
-    print('Finished calculating summary statistics')
+    if log: print('Finished calculating summary statistics')
     return ssvect, ssdata
 
 def deltax(data,usetype=[1]):
@@ -119,8 +119,8 @@ def deltax(data,usetype=[1]):
 def deltaphi(data):
     return (data.Nvals[-1] - data.Nvals[0])*(np.pi*data.param.R*data.param.R)/(data.param.Lx*data.param.Ly)        
 
-# def mean_vect_vel(datA):
-#     return 1/N(\sum v_x, \sum v_y)
+def mean_vect_vel(data):
+    return data.vval.mean(axis=1)
 
 def ApplyPeriodic2d(data,dr):
     dr[:,0]-=data.param.Lx*np.round(dr[:,0]/data.param.Lx)

@@ -1,4 +1,4 @@
-eduardoimport time
+import time
 import os
 import argparse
 import json
@@ -49,20 +49,28 @@ def main(args):
                     folder=args.outputfolder, \
                     save_prob=args.save_prob, \
                     starttime = args.starttime, \
-                    endtime = args.endtime)
-    simulator, prior = prepare_for_sbi(sim.wrapper, prior)
-
+                    endtime = args.endtime, \
+                    proposal = prior,
+                    num_simulations=args.nruns,
+                    batch_size = args.batch_size,
+                    num_workers = args.nprocs)
+    
+    # simulator, prior = prepare_for_sbi(sim.wrapper, prior)
     # Running simulations
     print('Beginning simulation rounds')
     tic = time.perf_counter() 
 
-    theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=args.nruns, num_workers = args.nprocs)
+    theta, x = sim.sample()
+    # theta, x = simulate_for_sbi(simulator, proposal=prior, num_simulations=args.nruns, num_workers = args.nprocs)
     # Save parameter/observable data
     picklefile = open(f'{args.outputfolder}/data/{args.outputfile}_{time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())}.p', 'wb') 
     pickle.dump((theta,x), picklefile)
     toc = time.perf_counter()
     print(f"Completed simulations in {toc - tic:0.4f} seconds")
-
+    if args.state == 'confluent':
+        x = x[:,:,0].float()
+    else:
+        x = x[:,:,1].float()
     # Run inference
     if 'flow' in args.posterioropt:
         flow_density_estimator_build_fun = posterior_nn(model='maf', hidden_features=60, num_transforms=3)
@@ -92,8 +100,9 @@ if __name__ == "__main__":
     parser.add_argument('--log', dest='log', action='store_true',help='Testing summary statistics using previously saved file')
     parser.add_argument('--no-log', dest='log', action='store_false')
     parser.add_argument('-s','--save_prob',type = float, default = 0, help='(float)\nProbability of saving file')
-    parser.add_argument('-nruns','--nruns',type = int, default = 1000, help='(int)\nNumber of simulations to run')
-    parser.add_argument('-nprocs','--nprocs',type = int, default = 16, help='(int)\nNumber of cores to use')
+    parser.add_argument('-nruns','--nruns',type = int, default = 10, help='(int)\nNumber of simulations to run')
+    parser.add_argument('-nprocs','--nprocs',type = int, default = 4, help='(int)\nNumber of cores to use')
+    parser.add_argument('-batch','--batch_size',type = int, default = 4, help='(int)\nBatchsize')
     #io data
     parser.add_argument('-ofo','--outputfolder', default = 'output/', help='(str)\nFolder for data')
     parser.add_argument('-ofi','--outputfile', default = 'run0', help='(str)\nFolder for data')
@@ -102,13 +111,14 @@ if __name__ == "__main__":
     # simulation data (inc parameter and ranges) 
     parser.add_argument('-theta', '--theta', nargs = '+', default = [],help='(list)\nList of parameter values to pass to simulation')
     parser.add_argument('-c', '--configfile', default = "include/config/simconfig.json")
-    parser.add_argument('-d', '--thetadict', type=str, default = '{"factive":"v0", "pairstiff":"k", "tau":"tau"}', help='(dict)\nDictionary mapping simulation parameters to passed parameters')
-    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 4e-4,0],help='(list)\nList of lowerbound parameters values')
-    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 8e-3,1], help='(list)\nList of upperbound parameters values')
-    parser.add_argument('-start','--starttime',type = int, default = 60, help='(int)\nStarting frame number for summary statistics')
-    parser.add_argument('-end','--endtime',type = int, default = 320, help='(int)\nFinal frame number for summary statistics')
+    parser.add_argument('-d', '--thetadict', type=str, default = '{"factive":"v0", "pairstiff":"k", "tau":"tau", "alignment":"alignment", "deathrate": "a"}', help='(dict)\nDictionary mapping simulation parameters to passed parameters')
+    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 0,4e-4],help='(list)\nList of lowerbound parameters values')
+    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 1,8e-3], help='(list)\nList of upperbound parameters values')
+    parser.add_argument('-start','--starttime',nargs='+', default = [60,321], help='(int)\nStarting frame number for summary statistics')
+    parser.add_argument('-end','--endtime',nargs='+', default = [320,480], help='(int)\nFinal frame number for summary statistics')
     # summary statistics to calculate
-    parser.add_argument('-ssopts','--summstatsopts', nargs = '+', default = ['A','B','C','D', 'E', 'F','G'], help='(list)\nSummary statistics to calculate (see allium/summstats.py for more details')
+    parser.add_argument('-ssopts','--summstatsopts', nargs = '+', default = ['A','B','C','D','E','F','G','H'], help='(list)\nSummary statistics to calculate (see allium/summstats.py for more details')
+    parser.add_argument('-state','--state', type = str, default = 'confluent', help='(str)\nOption for calculation of posterior (though both sets of summstats are saved)')
     #posterior options
     parser.add_argument('--pcalc', dest='pcalc', help = '(bool)\nCalculating posterior based on simulation run')
     parser.add_argument('--non-pcalc', dest='pcalc')

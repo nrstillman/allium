@@ -1,27 +1,31 @@
 import sys
+import time
+import copy 
+import signal
 # This will be replaced by a called function in later releases
 sys.path.append('simulator/') 
 
 import json
-import time
+import numpy as np
 import pickle 
 import random
 import torch
 
-import numpy as np
 import pycapmd as capmd
 import allium
+from joblib import Parallel, delayed
 
 class Sim(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
+        self.counter = 1
         try:
             print(f'Parameter file loaded from {self.parameterFile}')
         except:
             self.parameterFile = "include/config/simconfig.json"
         #setting default values for testing simulation runs only 
         if not hasattr(self,'params'):
-            self.params = []
+            self.params = ['v0', 'k', 'tau']
         else:
             self.params = [p[1] for p in self.pmap.items()]        
         if not hasattr(self,'pmap'):
@@ -40,57 +44,86 @@ class Sim(object):
             self.keys = list(self.pmap.keys())
         
         if self.test:
+            print(self.keys)
             if not hasattr(self,'test_theta'):
                 if len(self.keys) == 3:
                     self.test_theta = [130, 85, 7]
                 else:
                     print("ERROR: No default parameters saved for this number of parameters. Set test parameters with test_theta")
 
+    def sample(self):
+        """
+        Sample simulator from proposed prior 
 
-    def wrapper(self, params):
+        """
+        x = torch.Size([self.num_simulations])
+        if len(self.starttime) > 1:
+            print("Caution: Running scratch and confluent simultaneously")
+
+        theta = self.proposal.sample(sample_shape=torch.Size([self.num_simulations]))    
+        batches = torch.split(theta, self.batch_size, dim=0)
+        simulation_outputs = Parallel(n_jobs=self.num_workers)(
+                delayed(self.wrapper)(batch) for batch in batches)
+        x = torch.cat(simulation_outputs, dim=0)
+        return theta, x
+        
+
+    def wrapper(self, p):
         """
         Returns summary statistics from active particle model of cells.
 
         Summarizes the output of the simulator and converts it to `torch.Tensor`.
         """
-        def sig_handler(signum, frame):
-            print(f'Error: segfault w params {params}')
+        xout = torch.Tensor()
+        for params in p:
+            print(f'Running simulation {self.counter}/{self.num_simulations} w params {params}')
+            def sig_handler(signum, frame):
+                print(f'Error: segfault w params {params}')
 
-        signal.signal(signal.SIGSEGV, sig_handler)
+            signal.signal(signal.SIGSEGV, sig_handler)
 
-        thetafilename = self.folder + self.run + '_'
-        for (a,b) in zip(list(self.pmap.keys()),params):
-            thetafilename+=f'{a}_{b:.1e}_'
-        if self.test:
-            theta = self.test_theta
-            try:
-                testout = self.test_folder
-            except:
-                testout = 'test_output'
-            file = f'{self.run}'
-            for (p,t) in zip(self.params,theta):
-                file+= f'_{p}_{t}'
+            thetafilename = self.folder + self.run + '_'
+            for (a,b) in zip(list(self.pmap.keys()),params):
+                thetafilename+=f'{a}_{b:.1e}_'
+            if self.test:
+                theta = self.test_theta
+                try:
+                    testout = self.test_folder
+                except:
+                    testout = 'test_output'
+                file = f'{self.run}'
+                for (p,t) in zip(self.params,theta):
+                    file+= f'_{p}_{t}'
 
-            file = f'{testout}/{file}.p'
-            with open( file, 'rb') as f:
-                obs = pickle.load(f)
-        else:    
-            obs = self.simulate(params)
-            if obs == None:
-                return torch.as_tensor([0]*self.nfeatures)
+                file = f'{testout}/{file}.p'
+                with open( file, 'rb') as f:
+                    obs = pickle.load(f)
+            else:    
+                obs = self.simulate(params)
+                if obs == None:
+                    return torch.as_tensor([0]*self.nfeatures)
 
-        save = random.uniform(0,1) < self.save_prob
-        
-        if save and not self.test:
-            with open(thetafilename[:-1] + '.p','wb') as f:
-                pickle.dump(obs, f)
+            save = random.uniform(0,1) < self.save_prob
+            
+            if save and not self.test:
+                with open(thetafilename[:-1] + '.p','wb') as f:
+                    pickle.dump(obs, f)
 
-        ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime, endtime=self.endtime)
-
-        with open(thetafilename + 'ss.p','wb') as f:
-            pickle.dump([ssdata, obs.param], f)
-
-        return torch.as_tensor(ssvect)
+            ssvect =[]
+            ssdata =[]
+            for s,e in zip(self.starttime, self.endtime):
+                tmp_obs = copy.deepcopy(obs)
+                vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e)
+                ssvect.append(vect0)
+                ssdata.append(data0)
+            
+            with open(thetafilename + 'ss.p','wb') as f:
+                pickle.dump([ssdata, obs.param], f)
+            # below is horrible... needs to be sorted
+            ssvect = torch.as_tensor(np.asarray((ssvect[0],ssvect[1])).reshape(1,len(ssvect[0]),2))
+            xout = torch.cat((xout, ssvect),0)
+            self.counter +=1
+        return torch.as_tensor(xout)
 
     def simulate(self, params):
         """
