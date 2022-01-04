@@ -56,6 +56,7 @@ class Sim(object):
         Sample simulator from proposed prior 
 
         """
+        print(self.num_simulations)
         x = torch.Size([self.num_simulations])
         if len(self.starttime) > 1:
             print("Caution: Running scratch and confluent simultaneously")
@@ -65,17 +66,18 @@ class Sim(object):
         simulation_outputs = Parallel(n_jobs=self.num_workers)(
                 delayed(self.wrapper)(batch) for batch in batches)
         x = torch.cat(simulation_outputs, dim=0)
+        print(x.shape)
         return theta, x
         
-
     def wrapper(self, p):
         """
         Returns summary statistics from active particle model of cells.
 
         Summarizes the output of the simulator and converts it to `torch.Tensor`.
         """
-        xout = torch.Tensor()
-        for params in p:
+        idx = []
+        xout = torch.Tensor()#zeros((1,15,1))
+        for i, params in enumerate(p):
             print(f'Running simulation {self.counter}/{self.num_simulations} w params {params}')
             def sig_handler(signum, frame):
                 print(f'Error: segfault w params {params}')
@@ -108,22 +110,29 @@ class Sim(object):
             if save and not self.test:
                 with open(thetafilename[:-1] + '.p','wb') as f:
                     pickle.dump(obs, f)
-
-            ssvect =[]
-            ssdata =[]
-            for s,e in zip(self.starttime, self.endtime):
-                tmp_obs = copy.deepcopy(obs)
-                vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e)
-                ssvect.append(vect0)
-                ssdata.append(data0)
-            
-            with open(thetafilename + 'ss.p','wb') as f:
-                pickle.dump([ssdata, obs.param], f)
-            # below is horrible... needs to be sorted
-            ssvect = torch.as_tensor(np.asarray((ssvect[0],ssvect[1])).reshape(1,len(ssvect[0]),2))
-            xout = torch.cat((xout, ssvect),0)
-            self.counter +=1
-        return torch.as_tensor(xout)
+            #Calculate summary statistics here
+            try:
+                ssvect =[]
+                ssdata =[]
+                for s,e in zip(self.starttime, self.endtime):
+                    tmp_obs = copy.deepcopy(obs)
+                    vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e)
+                    ssvect.append(vect0)
+                    ssdata.append(data0)
+                    #save with starttime            
+                    with open(f'{thetafilename}_starttime_{s}_ss.p','wb') as f:
+                        pickle.dump([ssdata, obs.param], f)
+                # below is horrible... needs to be sorted
+                ssvect = torch.as_tensor(np.asarray((ssvect[0],ssvect[1])).reshape(1,len(ssvect[0]),2))
+                xout = torch.cat((xout, ssvect),0)                
+            except:
+                bad_output = f'{thetafilename}_badss.p'
+                print(f"Error: Exception raised during calculation of summary statistiscs. Output saved to {bad_output}")
+                with open(bad_output,'wb') as f:
+                    pickle.dump(obs, f)
+                pass          
+            idx.append(i)
+        return torch.as_tensor(xout)#, p[idx]
 
     def simulate(self, params):
         """
@@ -263,7 +272,8 @@ class Sim(object):
                             zapList.append(idx)
                 
                 sim.killCells(capmd.VectorInt(zapList))
-                print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="")
+                if self.log:
+                    print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="", file=open('log.txt', 'a'))
             # Test for population dynamicss
             if (t % params.popdynfreq == 0): 
                 sim.populationDynamics(params.popdynfreq)
@@ -319,7 +329,7 @@ class Sim(object):
                             zapList.append(idx)
                 
                 sim.killCells(capmd.VectorInt(zapList))
-                print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="")
+                # print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="")
             # Test for population dynamicss
             if (t % params.popdynfreq == 0): 
                 sim.populationDynamics(params.popdynfreq)

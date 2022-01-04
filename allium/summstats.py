@@ -4,7 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-def calculate_summary_statistics(d, opts = ['A','B','C','D','E'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [0,1,2]):
+def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [0,1,2]):
     """
     Calculates summary statistics.
 
