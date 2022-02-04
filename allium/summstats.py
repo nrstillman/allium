@@ -235,8 +235,8 @@ def getMSD(data,takeDrift, usetype=[1],verbose=True):
 
     data.hasMSD = True
     data.msd = msd
-
-    xval=np.linspace(0,data.Nsnap*data.param.dt*data.param.output_time,num=data.Nsnap)
+                    #careful with data.param here
+    xval=np.linspace(0,data.Nsnap*data.param.timeconversion,num=data.Nsnap)
     if verbose:
         fig=plt.figure()
         plt.loglog(xval,msd,'r.-',lw=2)
