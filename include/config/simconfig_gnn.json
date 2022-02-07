@@ -1,0 +1,97 @@
+{
+    "outputfolder": "allium/testfolder/",
+    "filename": "gnn",
+    "output_time": 100, 
+    "output_type": "text",
+    "t_final": 30000, 
+    "popdynfreq": 1000000,
+    "zaptime": 1000000, 
+    
+    "R": 1,
+
+    "Lx": 10,
+    "Ly": 10,
+
+    "dt": 0.01,
+    "dim": 2,
+
+    "eps": 0.001,
+    "N": 100,
+    "init_opt": "random_unif",
+    "bc_opt": "periodic",
+    "Ntracer": 0,
+    "Nstem": 0,
+    "btype": 0,
+    "flag": 0,
+    "type": 0,
+    "poly": 0.3,
+    "cutoff": 3,
+    "ntypes": 1,
+    "fade": 1,
+    "pairstiff": [
+        [
+            10,
+            10,
+            10
+        ],
+        [
+            10,
+            10,
+            10
+        ],
+        [
+            10,
+            10,
+            10
+        ]
+    ],
+
+    "pairatt": [
+        [
+            0.0,
+            0.0,
+            0.0
+        ],
+        [
+            0.0,
+            0.0,
+            0.0
+        ],
+        [
+            0.0,
+            0.0,
+            0.0
+        ]
+    ],
+    "factive": [
+        0.01,
+        0.01,
+        0.01
+    ],
+    "zeta": [
+        1,
+        1,
+        1
+    ],
+    "tau": [
+        10,
+        10,
+        10
+    ],
+    "alignment": [
+        0,
+        0,
+        0
+    ],
+    "deathrate": [
+        0.000,
+        0,
+        0.000
+    ],
+    "divrate": [
+        0.00,
+        0.0,
+        0.00
+    ],
+    "maxZ": 6
+}
