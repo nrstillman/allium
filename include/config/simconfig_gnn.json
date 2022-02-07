@@ -1,9 +1,9 @@
 {
     "outputfolder": "allium/testfolder/",
     "filename": "gnn",
-    "output_time": 100, 
+    "output_time": 50, 
     "output_type": "text",
-    "t_final": 30000, 
+    "t_final": 15000, 
     "popdynfreq": 1000000,
     "zaptime": 1000000, 
     
