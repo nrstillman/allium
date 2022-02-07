@@ -12,7 +12,7 @@ class param:
 		self.R = 8
 		self.framerate = 0.083
 		self.dt = 0.001
-		self.output_time = 83
+		self.output_time = self.framerate/self.dt
 
 class ExperimentData:
 
