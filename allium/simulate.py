@@ -11,6 +11,11 @@ import pickle
 import random
 import torch
 
+# only used for calc of adjacency matrix
+import pandas as pd
+import numpy as np
+from scipy.spatial import distance_matrix
+
 import pycapmd as capmd
 import allium
 from joblib import Parallel, delayed
@@ -35,6 +40,8 @@ class Sim(object):
             self.log = False
         if not hasattr(self,'nfeatures'):
             self.nfeatures = 15
+        if not hasattr(self,'adjacency'):
+            self.adjacency = False
 
         if not hasattr(self,'test'):
             self.test = False
@@ -215,6 +222,11 @@ class Sim(object):
                         setattr(params, key, [value,0,value])
                     else:
                         setattr(params, key, [value,value,value])
+        
+            if hasattr(self,'folder'):
+                setattr(params,'outputfolder',f'allium/{self.folder}/')
+                print(f'Changed output folder -> {self.folder}')
+
             return params
 
         def paramsFromFile(paramObj, fileName):
@@ -260,6 +272,15 @@ class Sim(object):
                 tic2 = time.perf_counter()
                 timesteps.append(t)
 
+                if self.adjacency:
+                    # Calculating adjacency matrix here based on interaction range
+                    xy = sim.getPopulationPosition(capmd.VectorInt(range(sim.popSize())))
+                    df = pd.DataFrame(xy, columns=['x','y'])
+                    dist_matrix = pd.DataFrame(distance_matrix(df[['x','y']].values,df[['x','y']]), index=df.index, columns=df.index)
+                    interaction_range = 1.2#params.cutoffZ
+                    adj_matrix = 1*(dist_matrix<1.2).values
+                    np.savetxt(f'{self.folder}/adjMatrix_{t:06d}.dat', adj_matrix)
+
             # Test for scratch
             if (t == params.zaptime):
                 p = getPopulation(sim)            
@@ -284,60 +305,3 @@ class Sim(object):
                 d[att] =  getattr(params,att)
             
         return allium.data.SimData(params=d, data=popArray, loadtimes = [0,int(params.t_final/params.output_time)])
-
-    def sim_neighbours(self):
-        if log:
-            print(f"# of parameters = {len(p)}", file=open('log.txt', 'a'))
-        else:
-            print(f"# of parameters = {len(p)}")
-        tic = time.perf_counter()
-        tic2 = time.perf_counter()
-        parameterFile = "include/config/simconfig_neighbours.json"
-        params = paramsFromFile(capmd.Parameters(), parameterFile)
-        params = updateParams(p, params,log)
-        sim = capmd.interface(params)
-        timesteps = []
-        x = []
-        Rlength = params.Lx/4
-        maxR = [ Rlength/2,  params.Ly]
-        minR = [-Rlength/2, -params.Ly]
-        popArray = []
-        for t in range(params.t_final):
-            sim.move()
-            # Test for output
-            if (t % params.output_time == 0):            
-                p = getPopulation(sim)   
-                printOutput(t, [tic, tic2], p,log)
-                popArray.append(p)         
-                if (params.output_type == 'all'):
-                    sim.saveData("text")
-                    sim.saveData("vtp")
-                else:
-                    sim.saveData(params.output_type)            
-                tic2 = time.perf_counter()
-                timesteps.append(t)
-
-            # Test for scratch
-            if (t == params.zaptime):
-                p = getPopulation(sim)            
-                zapList = []
-                for i in range(sim.popSize()):
-                    x = sim.getPopulationPosition(capmd.VectorInt([i]))[0]
-                    if ((x[0] < maxR[0]) & (x[0] > minR[0])):
-                        if ((x[1] < maxR[1]) & (x[1] > minR[1])):
-                            idx = sim.getPopulationId(capmd.VectorInt([i]))[0]
-                            zapList.append(idx)
-                
-                sim.killCells(capmd.VectorInt(zapList))
-                # print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="")
-            # Test for population dynamicss
-            if (t % params.popdynfreq == 0): 
-                sim.populationDynamics(params.popdynfreq)
-            
-        d = {}
-        for att in dir(params):
-            if not(att.startswith('__')):
-                d[att] =  getattr(params,att)
-
-        return {'data':popArray, 'params':d, 'time':timesteps, 'dt':timesteps[1] - timesteps[0]}
-
