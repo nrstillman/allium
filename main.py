@@ -111,9 +111,9 @@ if __name__ == "__main__":
     # simulation data (inc parameter and ranges) 
     parser.add_argument('-theta', '--theta', nargs = '+', default = [],help='(list)\nList of parameter values to pass to simulation')
     parser.add_argument('-c', '--configfile', default = "include/config/simconfig.json")
-    parser.add_argument('-d', '--thetadict', type=str, default = '{"factive":"v0", "pairstiff":"k", "tau":"tau", "alignment":"alignment"}', help='(dict)\nDictionary mapping simulation parameters to passed parameters')
-    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 0,4e-4],help='(list)\nList of lowerbound parameters values')
-    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 1,8e-3], help='(list)\nList of upperbound parameters values')
+    parser.add_argument('-d', '--thetadict', type=str, default = '{"factive":"v0", "pairstiff":"k", "tau":"tau", "alignment":"alignment", "N":"N"}', help='(dict)\nDictionary mapping simulation parameters to passed parameters')
+    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 0,4e-4, 10],help='(list)\nList of lowerbound parameters values')
+    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 1,8e-3, 1000], help='(list)\nList of upperbound parameters values')
     parser.add_argument('-start','--starttime',nargs='+', default = [60,321], help='(int)\nStarting frame number for summary statistics')
     parser.add_argument('-end','--endtime',nargs='+', default = [320,480], help='(int)\nFinal frame number for summary statistics')
     # summary statistics to calculate

@@ -6,13 +6,13 @@ class Parameters(object):
 
 # global param #required for pickling
 class param:
-	def __init__(self):
-		self.Lx = 800
-		self.Ly = 800
-		self.R = 8
-		self.framerate = 0.083
+	def __init__(self, framerate, Lx, Ly, R ):
+		self.Lx = Lx
+		self.Ly = Ly
+		self.R = R
+		self.framerate = framerate #given in hours
 		self.dt = 0.001
-		self.output_time = self.framerate/self.dt
+		self.output_time = int(self.framerate/self.dt)
 
 class ExperimentData:
 
@@ -20,67 +20,62 @@ class ExperimentData:
 		return np.isin(self.ptype[frames],readtypes)
 		
 	def truncateto(self,start, endtime):
-		self.Nsnap = endtime - start
-		self.Nvariable = False
-		self.flag =  self.flag[start:endtime]
-		self.rval = self.rval[start:endtime]
-		self.vval = self.vval[start:endtime]
-		# self.radius = self.radius[start:endtime]
-		self.ptype = self.ptype[start:endtime]
+		if not self.truncated:
+			self.Nsnap = endtime - start
+			self.flag =  self.flag[start:endtime]
+			self.rval = self.rval[start:endtime]
+			self.vval = self.vval[start:endtime]
+			# self.radius = self.radius[start:endtime]
+			self.ptype = self.ptype[start:endtime]
+			self.truncated = True
+		else:
+			print("Already truncated. Skipping this step")
 
-	def __init__(self,data,properties):
+		# Subtracting avg posn and vel and each timepoint
+	def takeDrift(data, usetype=[1]):
+		if not self.drift_removed:
+		    rdrift = data.rval[1:data.Nsnap,:,:].mean(axis=0) - data.rval[:data.Nsnap-1,:,:].mean(axis=0)
+		    vdrift = data.vval.mean(axis=1)
 
-		self.param = param()
-		self.sigma = 8
-		self.umpp = 0.8
-		self.framerate = 0.083 #hours
+		    self.rval -= rdrift
+		    self.vval -= vdrift
+		else:
+			print("Drift already removed. Skipping this step")
+
+
+	def __init__(self,data,properties, framerate=0.083, Lx = 800, Ly =800, R = 10, umpp=0.8):
+
+		self.Nvariable = True
+		self.truncated = False
+		self.drift_removed = False
+		self.param = param( framerate, Lx, Ly, R )
+		self.umpp = umpp #microns per pixel
+		self.sigma = R
 
 		self.Nvals = [data[data[:,1] == n].shape[0] for n in range(properties['t'][-1])]
-		maxNcells = max(self.Nvals)
+		
+		self.flags = np.unique(data[:,0]) 
+		# count number of occurances of each flag
+		counts = np.bincount(data[:,0].astype(int))
+		# remove those flags that never occur (such as 0)
+		counts = counts[counts !=0]
+		# remove those flags which are only there for 5 frames
+		self.flags = self.flags[counts>5]
+		self.flag_lifespan = counts[counts>5]
+		self.all_flags = len(self.flags)
 
-		self.rval = np.zeros((properties['t'][-1]-1,maxNcells,2))
-		self.flag = np.zeros((properties['t'][-1]-1,maxNcells))
-		self.ptype = np.zeros((properties['t'][-1]-1,maxNcells))
-		d = []
-		tracers = []
+		self.Nsnap = properties['t'][-1] - properties['t'][0] -1
 
-		for n in range(1,properties['parent'][-1]):
-			if len(data[data[:,0] == n]) == (properties['t'][-1]):
-				tracers.append(n)
-
-		for n in range(1,properties['t'][-1]):
-			Ncells = len(data[data[:,1] == n])
-			self.rval[n-1,:Ncells,:] = data[data[:,1] == n][:,2:]*self.umpp
-			self.flag[n-1,:Ncells] = data[data[:,1] == n][:,0]
-			self.ptype[n-1,:] = np.asarray([int(n in tracers) for n in self.flag[n-1]])
-
-		# self.vval = np.zeros((properties['t'][-1]-2,maxNcells,2))
-		# for n in range(0, properties['t'][-1]-2):
-		# 	self.vval[n,self.ptype[n] == 1,:]  = (self.rval[n+1][self.ptype[n+1] == 1] - self.rval[n][self.ptype[n] == 1])
-		# 	self.vval[n,self.ptype[n] == 1,:] *= (60/self.framerate) #converts from um/min to um/hour 
-		# # TODO: new_from_here
-		self.max_N_flag = self.flag[-1][-1]
-		#loop through and only copy rvalues for those trajectories longer than 5 steps
-		flags = []
-		for flag in range(int(self.max_N_flag)):
-		    time = np.linspace(1,self.flag.shape[0],self.flag.shape[0])*(self.flag == flag).sum(axis=1)
-		    time = np.asarray(time)
-		    
-		    if sum(time!=0) > 5:
-		        print(flag, end='\r')
-		        flags.append(flag)
-		print('Quick first stage finished')
 		rvalues = []
 		timevalues = []
 		velvalues = []
-		#generate flag specific rvalues,timevalues and velvalues
-	
-		for flag in flags[1:]:
-		    print(flag, end='\r')
+
+		#generate flag specific rvalues,timevalues and vel values
+		for f in self.flags:
 		    # get all rvalues related to a flag and turn into a numpy array
-		    rval = np.concatenate([r[self.flag[t] == flag] for t,r in enumerate(self.rval)],axis=0)
-		    # get all time values related to a flag and +1 to avoid removing 0th time later on
-		    time = np.asarray([(t+1)*sum(self.flag[t] == flag) for t,r in enumerate(self.rval)])
+		    rval = data[:,2:][data[:,0] == f]
+		    # get all time values related to a flag
+		    time = data[:,1][data[:,0] == f] 
 		    
 		    # append everything but the first which is removed as there is no veloc data there
 		    rvalues.append(rval[1:])
@@ -89,23 +84,22 @@ class ExperimentData:
 		    velvalues.append(np.diff(rval, axis=0))
 
 		# ^data now ordered by flag number
-		print('Slow second stage finished (should be quick from now).')
 		# length of all flags
-		self.flag_lifespan = np.asarray([len(r) for r in rvalues])
-
-		self.max_T = self.flag_lifespan.max()
 		r_new = []
 		flag_new = []
 		v_new = []
 
-		#Reorder to become time
-		for t in range(2,self.max_T):
+		#Reorder to become time -> This is horrific... 
+		for t in range(properties['t'][0]+1,properties['t'][-1]):
 		    print(t,end='\r')
 		    flagtmp = []
 		    rtmp =[]
 		    vtmp = []
-		    for i, flag in enumerate(flags[1:]):
+		    #loop through flags
+		    for i, flag in enumerate(self.flags):
+		    	# find flag that has this timevalue
 		        if bool(sum(timevalues[i]==t)):
+		        	#append to tmp lists
 		            flagtmp.append(flag)
 		            rtmp.append(rvalues[i][timevalues[i]==t])            
 		            vtmp.append(velvalues[i][timevalues[i]==t])            
@@ -117,15 +111,17 @@ class ExperimentData:
 		self.flags_per_timestep = np.asarray([len(flag) for flag in flag_new])
 		self.maxN = self.flags_per_timestep.max()
 
-		self.rval = np.zeros((self.max_T-2, self.flags_per_timestep.max(),2))
-		self.vval = np.zeros((self.max_T-2, self.flags_per_timestep.max(),2))
-		self.flag = np.zeros((self.max_T-2, self.flags_per_timestep.max()))
+		self.rval = np.zeros((self.Nsnap, self.flags_per_timestep.max(),2))
+		self.vval = np.zeros((self.Nsnap, self.flags_per_timestep.max(),2))
+		self.flag = np.zeros((self.Nsnap, self.flags_per_timestep.max()))
 		#Turn back into arrayss
-		for t in range(self.max_T-2):
+		for t in range(self.Nsnap):
 		    self.rval[t,:len(r_new[t]),:] = r_new[t]
 		    self.vval[t,:len(v_new[t]),:] = v_new[t]
 		    self.flag[t,:len(flag_new[t])] =  flag_new[t]
-
+		# get all those cells which are in all frames (tracers) 
+		self.tracers = self.flags[self.flag_lifespan == (self.Nsnap+2)]
+		self.ptype = np.isin(self.flag,self.tracers)*1
 
 class SimData:
 	def checkTypes(readtypes,data):

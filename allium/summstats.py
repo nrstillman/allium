@@ -12,6 +12,9 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
     # 0 is new cells, 1 is tracer, 2 is original (check this)    
     # remove any data post zap
     d.truncateto(starttime, endtime)
+    if takeDrift:
+         d.takeDrift()
+
     ssdata = {}
     ssvect = []
     if 'A' in opts:
@@ -96,16 +99,21 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         else:
             ssvect.append(0)
     if 'F' in opts:
-        # # F - Mean horizontal displacement
+        # # F - Radial distribution function, g(r)
+        rdist, gr = gr(data, verbose=plot)
+
+    if 'G' in opts:
+        # # G - Mean horizontal displacement
         if log: print('Finished calculating F. avg. horiz. disp. (from midway point)')
         ssvect.append(deltax(d))
 
-    if 'G' in opts:
-        # # G - Change in density
+    if 'H' in opts:
+        # # H - Change in density
         if log: print('Finished calculating G. change in phi')
         ssvect.append(deltaphi(d))
 
-    if 'H' in opts:
+    if 'I' in opts:
+        # # I - average vector velocity
         ssvect.append(mean_vect_vel)
 
     if log: print('Finished calculating summary statistics')
@@ -126,21 +134,6 @@ def ApplyPeriodic2d(data,dr):
     dr[:,0]-=data.param.Lx*np.round(dr[:,0]/data.param.Lx)
     dr[:,1]-=data.param.Ly*np.round(dr[:,1]/data.param.Ly)
     return dr
-
-# Revisit this 
-# By design, this is only meaningful on the whole data set, e.g. do not subtract for tracer particles only
-def takeDriftFcn(data, Nvariable = True, usetype=[1]):
-    data.drift=np.zeros((data.Nsnap,2))
-    if Nvariable:
-        print("Dynamics:: Variable N: Taking off the drift is meaningless. Doing nothing.")
-    else:   
-        for u in range(1,data.Nsnap):
-            tracers = data.gettypes(usetype,u)
-            dr=ApplyPeriodic2d(data, data.rval[u,tracers,:]-data.rval[u-1,tracers,:])
-            N = sum(tracers)
-            drift0=np.sum(dr,axis=0)/N
-            data.drift[u,:]=data.drift[u-1,:]+drift0
-    return data
 
 # relative velocity distribution (and average velocity)
 # component wise as well, assumes x and y directions only
@@ -206,10 +199,6 @@ def getMSD(data,takeDrift, usetype=[1],verbose=True):
         Nvariable = False
         gettracers = True
 
-    # Drift needs to work on tracers only (is this right?)
-    if takeDrift:
-        data = takeDriftFcn(data, Nvariable=Nvariable)
-        
     for u in range(data.Nsnap): 
         smax=data.Nsnap-u
         if gettracers:
@@ -226,22 +215,17 @@ def getMSD(data,takeDrift, usetype=[1],verbose=True):
             for n in range(smax):
                 dr[n] = ApplyPeriodic2d(data, dr[n])
 
-        if takeDrift:
-            hmm=(data.drift[:smax,:]-data.drift[u:,:])
-            takeoff=np.einsum('j,ik->ijk',np.ones((Ntrack,)),hmm)   
-            dr -= takeoff
-
         msd[u]=np.sum(np.sum(np.sum(dr**2,axis=2),axis=1),axis=0)/(Ntrack*smax)
 
     data.hasMSD = True
     data.msd = msd
                     #careful with data.param here
-    xval=np.linspace(0,data.Nsnap*data.param.timeconversion,num=data.Nsnap)
+    xval=np.linspace(0,data.Nsnap*data.param.framerate,num=data.Nsnap)
     if verbose:
         fig=plt.figure()
         plt.loglog(xval,msd,'r.-',lw=2)
         plt.loglog(xval,msd[1]/(1.0*xval[1])*xval,'-',lw=2,color=[0.5,0.5,0.5])
-        plt.xlabel('time')
+        plt.xlabel('time (hours)')
         plt.ylabel('MSD')
         plt.title('Mean square displacement')
         plt.show()
@@ -262,7 +246,6 @@ def getVelAuto(data,usetype=[1],verbose=True):
         else:
             gettracers = True
             Nvariable= False
-
 
     # First compute normalised velocities. Note: normalised by mean velocity in the whole system at that time, not unit vectors!
     Ntrack = sum(data.gettypes(usetype,0))
@@ -287,6 +270,49 @@ def getVelAuto(data,usetype=[1],verbose=True):
         plt.title('Normalised Velocity autocorrelation function')
         plt.show()
     return xval, velauto, v2av        
+
+def gr(data,  verbose = True, periodic=True, section = [150,850],resolution=2):
+    
+    max_distance = min(data.Lx,data.Ly)/4
+    Nrings = int(max_distance/resolution)
+
+    area = np.zeros(Nrings)
+    for j in range(Nrings):
+        r1 = j * resolution
+        area[j] = 2*np.pi*r1*resolution
+
+    if len(section) > 0:
+    # only consider a subsection of the data
+    ind = list(set(((section[0]<data.rval[t][:,1]) & 
+                    (data.rval[t][:,1] <section[1]))*range(len(data.rval[t])))
+       .intersection(((section[0]<data.rval[t][:,0]) &
+                     (data.rval[t][:,0] <section[1]))*range(len(data.rval[t]))))
+    # loop through the frames and calculate g(r) 
+    for t in range(data.Nsnap):
+        #have to renormalise due to taking section
+        x = data.rval[t][:,0][ind][1:] - section[0]
+        y = data.rval[t][:,1][ind][1:] - section[0]
+        xy =  data.rval[t][ind][1:] - section[0]
+
+        for p in xy:
+            for i,b in enumerate(bins):
+                r = i*resolution
+                near =  find_near(p,r-resolution, r)
+
+                tbins[i] += near.sum()
+
+    gr = tbins/data.Nsnap/area
+
+    # normalize such g(r) = 1 for r->inf 
+    gr = gr/gr[-1]
+    if verbose:
+        plt.plot(rdist, (tbins/data.Nsnap/area)/(tbins/data.Nsnap/area)[-1])
+        plt.xlim([0,max_distance])
+        plt.xlabel('r')
+        plt.ylabel('g(r)')
+        plt.show
+    return rdist, gr
+
 
 # Definition of the self-intermediate scattering function (Flenner + Szamel)
 # 1/N <\sum_n exp(iq[r_n(t)-r_n(0)]>_t,n
@@ -315,22 +341,14 @@ def SelfIntermediate(data,qval,takeDrift,usetype=[1],verbose=True, periodic=True
             for n in range(smax):
                 dr[n] = ApplyPeriodic2d(data, dr[n])
 
-        if takeDrift:
-            hmm=(data.drift[:smax,:]-data.drift[u:,:])
-            takeoff=np.einsum('j,ik->ijk',np.ones((Ntrack,)),hmm)
-
-            SelfInt[u]=np.sum(np.sum(np.exp(1.0j*qval[0]*(dr[:,:,0]+ takeoff[:,:,0])+ \
-                                            1.0j*qval[1]*(dr[:,:,1]+ takeoff[:,:,1]) \
-                                            ),axis=1),axis=0)/(Ntrack*smax)         
-        else:       
-            if periodic:
-                SelfInt[u]=np.sum(np.sum(np.exp(1.0j*qval[0]*dr[:,:,0]+ \
-                                                1.0j*qval[1]*dr[:,:,1] \
-                                            ),axis=1),axis=0)/(Ntrack*smax)         
-            else:   
-                SelfInt[u]=np.sum(np.sum(np.exp(1.0j*qval[0]*(rt[:,:,0]-rtplus[:,:,0]) + \
-                                                1.0j*qval[1]*(rt[:,:,1]-rtplus[:,:,1])\
-                                                ),axis=1),axis=0)/(Ntrack*smax)                    
+        if periodic:
+            SelfInt[u]=np.sum(np.sum(np.exp(1.0j*qval[0]*dr[:,:,0]+ \
+                                            1.0j*qval[1]*dr[:,:,1] \
+                                        ),axis=1),axis=0)/(Ntrack*smax)         
+        else:   
+            SelfInt[u]=np.sum(np.sum(np.exp(1.0j*qval[0]*(rt[:,:,0]-rtplus[:,:,0]) + \
+                                            1.0j*qval[1]*(rt[:,:,1]-rtplus[:,:,1])\
+                                            ),axis=1),axis=0)/(Ntrack*smax)                    
 
         
     # Looking at the absolute value of it here
