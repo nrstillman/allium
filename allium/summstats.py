@@ -100,7 +100,8 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
             ssvect.append(0)
     if 'F' in opts:
         # # F - Radial distribution function, g(r)
-        rdist, gr = gr(data, verbose=plot)
+        rdist, gr = calcgr(d, verbose=plot)
+        ssvect.append(rdist[np.where(gr == max(gr))][0])
 
     if 'G' in opts:
         # # G - Mean horizontal displacement
@@ -114,7 +115,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
 
     if 'I' in opts:
         # # I - average vector velocity
-        ssvect.append(mean_vect_vel)
+        ssvect.append(mean_vect_vel(d))
 
     if log: print('Finished calculating summary statistics')
     return ssvect, ssdata
@@ -271,43 +272,58 @@ def getVelAuto(data,usetype=[1],verbose=True):
         plt.show()
     return xval, velauto, v2av        
 
-def gr(data,  verbose = True, periodic=True, section = [150,850],resolution=2):
+def calcgr(data,  verbose = True, periodic=True, section = [150,850],resolution=2):
     
-    max_distance = min(data.Lx,data.Ly)/4
+    def ApplyPeriodic2d(L,dr,):
+        dr[0]-=L[0]*np.round(dr[0]/L[0])
+        dr[1]-=L[1]*np.round(dr[1]/L[1])
+        return dr
+
+    def find_near(particle, xy, lower,upper, L):
+        dr = np.sqrt((ApplyPeriodic2d(L,xy - particle)**2).sum(axis=1))
+        return (lower < dr) & (dr < upper)
+
+    max_distance = min(data.param.Lx,data.param.Ly)/4
     Nrings = int(max_distance/resolution)
+    rdist = np.linspace(0,max_distance,Nrings)
+
+    tbins = np.zeros(Nrings)
 
     area = np.zeros(Nrings)
     for j in range(Nrings):
         r1 = j * resolution
         area[j] = 2*np.pi*r1*resolution
 
-    if len(section) > 0:
-    # only consider a subsection of the data
-    ind = list(set(((section[0]<data.rval[t][:,1]) & 
-                    (data.rval[t][:,1] <section[1]))*range(len(data.rval[t])))
-       .intersection(((section[0]<data.rval[t][:,0]) &
-                     (data.rval[t][:,0] <section[1]))*range(len(data.rval[t]))))
+    L = [l - 2*s for (l,s) in zip([data.param.Lx,data.param.Ly], section)]
+
     # loop through the frames and calculate g(r) 
     for t in range(data.Nsnap):
+        # only consider a subsection of the data
+        if len(section) > 0:
+            ind = list(set(((section[0]<data.rval[t][:,1]) & 
+                            (data.rval[t][:,1] <section[1]))*range(len(data.rval[t])))
+               .intersection(((section[0]<data.rval[t][:,0]) &
+                             (data.rval[t][:,0] <section[1]))*range(len(data.rval[t]))))
+
         #have to renormalise due to taking section
         x = data.rval[t][:,0][ind][1:] - section[0]
-        y = data.rval[t][:,1][ind][1:] - section[0]
-        xy =  data.rval[t][ind][1:] - section[0]
+        y = data.rval[t][:,1][ind][1:] - section[1]
+        xy =  data.rval[t][ind][1:] - section
 
         for p in xy:
-            for i,b in enumerate(bins):
+            for i,b in enumerate(tbins):
                 r = i*resolution
-                near =  find_near(p,r-resolution, r)
-
+                near =  find_near(p,xy, r-resolution, r, L)
                 tbins[i] += near.sum()
 
     gr = tbins/data.Nsnap/area
-
+    # remove first incase equals nan   
+    gr = gr[1:]
     # normalize such g(r) = 1 for r->inf 
     gr = gr/gr[-1]
     if verbose:
         plt.plot(rdist, (tbins/data.Nsnap/area)/(tbins/data.Nsnap/area)[-1])
-        plt.xlim([0,max_distance])
+        # plt.xlim([0,max_distance])
         plt.xlabel('r')
         plt.ylabel('g(r)')
         plt.show
