@@ -248,7 +248,7 @@ class Sim(object):
         for t in range(params.t_final):
             sim.move()
             # Test for output
-            if (t % params.output_time == 0):            
+            if (t % params.output_time == 0): 
                 p = getPopulation(sim)   
                 printOutput(t, [tic, tic2], p,self.log)
                 popArray.append(p)         

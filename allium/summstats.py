@@ -98,9 +98,12 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
             ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
         else:
             ssvect.append(0)
+            
     if 'F' in opts:
         # # F - Radial distribution function, g(r)
         rdist, gr = calcgr(d, verbose=plot)
+        ssdata['rdist'] = rdist
+        ssdata['gr'] = gr
         ssvect.append(rdist[np.where(gr == max(gr))][0])
 
     if 'G' in opts:
