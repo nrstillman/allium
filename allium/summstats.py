@@ -4,7 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [0,1,2]):
+def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [1,2]):
     """
     Calculates summary statistics.
 
@@ -98,7 +98,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
             ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
         else:
             ssvect.append(0)
-            
+
     if 'F' in opts:
         # # F - Radial distribution function, g(r)
         rdist, gr = calcgr(d, verbose=plot)
@@ -275,7 +275,7 @@ def getVelAuto(data,usetype=[1],verbose=True):
         plt.show()
     return xval, velauto, v2av        
 
-def calcgr(data,  verbose = True, periodic=True, section = [150,850],resolution=2):
+def calcgr(data,  verbose = True, periodic=True, section = [150,550],resolution=2):
     
     def ApplyPeriodic2d(L,dr,):
         dr[0]-=L[0]*np.round(dr[0]/L[0])
@@ -311,25 +311,30 @@ def calcgr(data,  verbose = True, periodic=True, section = [150,850],resolution=
         #have to renormalise due to taking section
         x = data.rval[t][:,0][ind][1:] - section[0]
         y = data.rval[t][:,1][ind][1:] - section[1]
-        xy =  data.rval[t][ind][1:] - section
+        xy = data.rval[t][ind][1:] - section
 
         for p in xy:
             for i,b in enumerate(tbins):
                 r = i*resolution
-                near =  find_near(p,xy, r-resolution, r, L)
-                tbins[i] += near.sum()
+                if (xy - p).shape[0] == 1:
+                    continue
+                else:
+                    near =  find_near(p,xy, r-resolution, r, L)
+                    tbins[i] += near.sum()
 
-    gr = tbins/data.Nsnap/area
+    gr = tbins[1:]/data.Nsnap/area[1:]
     # remove first incase equals nan   
     gr = gr[1:]
     # normalize such g(r) = 1 for r->inf 
     gr = gr/gr[-1]
     if verbose:
+        fig=plt.figure()
         plt.plot(rdist, (tbins/data.Nsnap/area)/(tbins/data.Nsnap/area)[-1])
         # plt.xlim([0,max_distance])
         plt.xlabel('r')
         plt.ylabel('g(r)')
-        plt.show
+        plt.title('Static structure factor (2d)')
+        plt.show()
     return rdist, gr
 
 

@@ -35,6 +35,8 @@ class Sim(object):
             self.log = False
         if not hasattr(self,'nfeatures'):
             self.nfeatures = 15
+        if not hasattr(self,'framerate'):
+            self.framerate = 0.0166
 
         if not hasattr(self,'test'):
             self.test = False
@@ -48,6 +50,8 @@ class Sim(object):
             if not hasattr(self,'test_theta'):
                 if len(self.keys) == 3:
                     self.test_theta = [130, 85, 7]
+                if len(self.keys) == 6:
+                    self.test_theta = [6.0225e+01, 7.4157e+01, 4.0066e+00, 4.4993e-01, 2.3977e-03, 9.9745e+02]
                 else:
                     print("ERROR: No default parameters saved for this number of parameters. Set test parameters with test_theta")
 
@@ -67,7 +71,7 @@ class Sim(object):
                 delayed(self.wrapper)(batch) for batch in batches)
         x = torch.cat(simulation_outputs, dim=0)
         print(x.shape)
-        return theta, x
+        return theta, simulation_outputs
         
     def wrapper(self, p):
         """
@@ -112,22 +116,34 @@ class Sim(object):
                     pickle.dump(obs, f)
             #Calculate summary statistics here
             try:
-                ssvect =[]
-                ssdata =[]
-                for s,e in zip(self.starttime, self.endtime):
-                    tmp_obs = copy.deepcopy(obs)
-                    vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e)
-                    ssvect.append(vect0)
-                    ssdata.append(data0)
+                if len(self.starttime) > 1:
+                    ssvect =[]
+                    ssdata =[]
+                    for s,e in zip(self.starttime, self.endtime):
+                        tmp_obs = copy.deepcopy(obs)
+                        tmp_obs.param.framerate = self.framerate
+                        # rescale time based on frame rate
+                        vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e,usetypes=[1,2])
+                        ssvect.append(vect0)
+                        ssdata.append(data0)
+                        #save with starttime            
+                        with open(f'{thetafilename}_starttime_{s}_ss.p','wb') as f:
+                            pickle.dump([ssvect, ssdata, obs.param], f)
+                    # below is horrible... needs to be sorted
+                    ssvect = torch.as_tensor(np.asarray((ssvect[0],ssvect[1])).reshape(1,len(ssvect[0]),2))
+                    xout = torch.cat((xout, ssvect),0)                
+                else:
+                    obs.param.framerate = self.framerate
+                    ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime[0], endtime=self.endtime[0],usetypes=[1,2])
                     #save with starttime            
-                    with open(f'{thetafilename}_starttime_{s}_ss.p','wb') as f:
-                        pickle.dump([ssdata, obs.param], f)
-                # below is horrible... needs to be sorted
-                ssvect = torch.as_tensor(np.asarray((ssvect[0],ssvect[1])).reshape(1,len(ssvect[0]),2))
-                xout = torch.cat((xout, ssvect),0)                
-            except:
+                    with open(f'{thetafilename}_starttime_{self.starttime[0]}_ss.p','wb') as f:
+                        pickle.dump([ssvect, ssdata, obs.param], f)
+                    ssvect = torch.as_tensor(np.asarray(ssvect).reshape(1,len(ssvect)))    
+                    xout = torch.cat((xout, ssvect),0)                
+            except Exception as e:
                 bad_output = f'{thetafilename}_badss.p'
                 print(f"Error: Exception raised during calculation of summary statistiscs. Output saved to {bad_output}")
+                print(e)
                 with open(bad_output,'wb') as f:
                     pickle.dump(obs, f)
                 pass          
@@ -194,7 +210,7 @@ class Sim(object):
                 #get neighbours here
             return popArray
 
-        def updateParams(p, params,keys,log=False):
+        def updateParams(p, params,keys,tracers=0.1, log=False):
             setattr(params, 'log', log)
             if not bool(len(p)):
                 print("No parameters updated")
@@ -210,7 +226,8 @@ class Sim(object):
                     elif key == 'pairatt':
                         setattr(params, key, [[value,value,value],[value,value,value],[value,value,value]])
                     elif key == 'N':
-                        setattr(params, key, value)
+                        setattr(params, 'N', int(value))
+                        setattr(params, 'Ntracer', int(value*tracers))
                     elif (key == 'deathrate') or (key == 'divrate'):
                         setattr(params, key, [value,0,value])
                     else:
@@ -237,7 +254,7 @@ class Sim(object):
         tic = time.perf_counter()
         tic2 = time.perf_counter()
         defaultparams = paramsFromFile(capmd.Parameters(), self.parameterFile)
-        params = updateParams(params, defaultparams,self.keys,self.log)
+        params = updateParams(params, defaultparams,self.keys,log=self.log)
         sim = capmd.interface(params)
         timesteps = []
         x = []
@@ -282,62 +299,6 @@ class Sim(object):
         for att in dir(params):
             if not(att.startswith('__')):
                 d[att] =  getattr(params,att)
-            
+        self.counter +=1
         return allium.data.SimData(params=d, data=popArray, loadtimes = [0,int(params.t_final/params.output_time)])
-
-    def sim_neighbours(self):
-        if log:
-            print(f"# of parameters = {len(p)}", file=open('log.txt', 'a'))
-        else:
-            print(f"# of parameters = {len(p)}")
-        tic = time.perf_counter()
-        tic2 = time.perf_counter()
-        parameterFile = "include/config/simconfig_neighbours.json"
-        params = paramsFromFile(capmd.Parameters(), parameterFile)
-        params = updateParams(p, params,log)
-        sim = capmd.interface(params)
-        timesteps = []
-        x = []
-        Rlength = params.Lx/4
-        maxR = [ Rlength/2,  params.Ly]
-        minR = [-Rlength/2, -params.Ly]
-        popArray = []
-        for t in range(params.t_final):
-            sim.move()
-            # Test for output
-            if (t % params.output_time == 0):            
-                p = getPopulation(sim)   
-                printOutput(t, [tic, tic2], p,log)
-                popArray.append(p)         
-                if (params.output_type == 'all'):
-                    sim.saveData("text")
-                    sim.saveData("vtp")
-                else:
-                    sim.saveData(params.output_type)            
-                tic2 = time.perf_counter()
-                timesteps.append(t)
-
-            # Test for scratch
-            if (t == params.zaptime):
-                p = getPopulation(sim)            
-                zapList = []
-                for i in range(sim.popSize()):
-                    x = sim.getPopulationPosition(capmd.VectorInt([i]))[0]
-                    if ((x[0] < maxR[0]) & (x[0] > minR[0])):
-                        if ((x[1] < maxR[1]) & (x[1] > minR[1])):
-                            idx = sim.getPopulationId(capmd.VectorInt([i]))[0]
-                            zapList.append(idx)
-                
-                sim.killCells(capmd.VectorInt(zapList))
-                # print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="")
-            # Test for population dynamicss
-            if (t % params.popdynfreq == 0): 
-                sim.populationDynamics(params.popdynfreq)
-            
-        d = {}
-        for att in dir(params):
-            if not(att.startswith('__')):
-                d[att] =  getattr(params,att)
-
-        return {'data':popArray, 'params':d, 'time':timesteps, 'dt':timesteps[1] - timesteps[0]}
 

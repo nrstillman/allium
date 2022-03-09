@@ -1,14 +1,14 @@
 {
     "outputfolder": "allium/data/sim/",
-    "filename": "wound_healing",
-    "output_time": 83, 
-    "output_type": "none",
-    "t_final": 39840, 
+    "filename": "nconfluent",
+    "output_time": 166, 
+    "output_type": "text",
+    "t_final": 33200, 
     "popdynfreq": 51,
-    "zaptime": 26560, 
+    "zaptime": 40000, 
     
     "phi": 1,
-    "R": 8,
+    "R": 10,
 
     "Lx": 800,
     "Ly": 800,
@@ -20,7 +20,7 @@
     "N": 3000,
     "init_opt": "random_unif",
     "bc_opt": "periodic",
-    "Ntracer": 100,
+    "Ntracer": 0,
     "Nstem": 0,
     "btype": 0,
     "flag": 0,
@@ -85,9 +85,9 @@
         0
     ],
     "deathrate": [
-        0.004,
-        0,
-        0.004
+        0.0,
+        0.0,
+        0.0
     ],
     "divrate": [
         0.04,
