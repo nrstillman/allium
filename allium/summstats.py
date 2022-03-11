@@ -102,6 +102,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
     if 'F' in opts:
         # # F - Radial distribution function, g(r)
         rdist, gr = calcgr(d, verbose=plot)
+        if log: print('Finished calculating F. g(r)')
         ssdata['rdist'] = rdist
         ssdata['gr'] = gr
         ssvect.append(rdist[np.where(gr == max(gr))][0])
@@ -322,14 +323,14 @@ def calcgr(data,  verbose = True, periodic=True, section = [150,550],resolution=
                     near =  find_near(p,xy, r-resolution, r, L)
                     tbins[i] += near.sum()
 
-    gr = tbins[1:]/data.Nsnap/area[1:]
     # remove first incase equals nan   
-    gr = gr[1:]
+    gr = tbins[1:]/data.Nsnap/area[1:]
+    rdist = rdist[1:]
     # normalize such g(r) = 1 for r->inf 
     gr = gr/gr[-1]
     if verbose:
         fig=plt.figure()
-        plt.plot(rdist, (tbins/data.Nsnap/area)/(tbins/data.Nsnap/area)[-1])
+        plt.plot(rdist, gr)
         # plt.xlim([0,max_distance])
         plt.xlabel('r')
         plt.ylabel('g(r)')

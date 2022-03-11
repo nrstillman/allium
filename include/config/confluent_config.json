@@ -17,10 +17,10 @@
     "dim": 2,
 
     "eps": 0.001,
-    "N": 3000,
+    "N": 250,
     "init_opt": "random_unif",
     "bc_opt": "periodic",
-    "Ntracer": 0,
+    "Ntracer": 25,
     "Nstem": 0,
     "btype": 0,
     "flag": 0,
@@ -90,9 +90,9 @@
         0.0
     ],
     "divrate": [
-        0.04,
+        0.074,
         0.0,
-        0.04
+        0.074
     ],
     "maxZ": 6
 }
