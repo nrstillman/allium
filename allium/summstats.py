@@ -4,7 +4,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [1,2]):
+def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [1,2],log_output="log.txt"):
     """
     Calculates summary statistics.
 
@@ -29,7 +29,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssdata['vav'] = vav
         ssdata['vdist'] = vdist
         ssdata['vdist2'] = vdist2
-        if log: print('Finished calculating A. vel. dist & mean vel')
+        if log: print('Finished calculating A. vel. dist & mean vel', file=open(log_output, 'a'))
         ssvect.append(vav.mean()) 
         ssvect.append(stats.kurtosis(vdist,fisher=False))
         ssvect.append(vdist.mean())
@@ -43,14 +43,14 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssdata['tval2'] = tval2
         ssdata['velauto'] = velauto
         ssdata['v2av'] = v2av
-        if log: print('Finished calculating B. autocorr vel fcn') 
+        if log: print('Finished calculating B. autocorr vel fcn', file=open(log_output, 'a'))
         ssvect.append(tval2[velauto < 5e-1][0])
     if 'C' in opts:
         # C - Mean square displacement
         tval, msd, d = getMSD(d,takeDrift, usetype=[1],verbose=plot)
         ssdata['tval'] = tval
         ssdata['msd'] = msd
-        if log: print('Finished calculating C. MSD') 
+        if log: print('Finished calculating C. MSD', file=open(log_output, 'a'))
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0])
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
         ssvect.append(ssdata['msd'][-1])
@@ -70,7 +70,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         xmax = d.param.Ly
         ssdata['dx'] = dx
         ssdata['xmax'] = xmax
-        if log: print('Finished calculating D. self-intermediate scattering fcn') 
+        if log: print('Finished calculating D. self-intermediate scattering fcn', file=open(log_output, 'a'))
         if np.sum(SelfInt2 < 0.5) > 0:
             ssvect.append(tval3[SelfInt2 < 0.5][0])
         else:
@@ -93,7 +93,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         x = spacebins[(50<spacebins) & (spacebins < 300)]
         y = velcorrReal[(50<spacebins) & (spacebins< 300)]
         
-        if log: print('Finished calculating E. vel. corr. fcn')
+        if log: print('Finished calculating E. vel. corr. fcn', file=open(log_output, 'a'))
         if np.sum(y>0) > 0:
             ssvect.append(np.polyfit(np.log(x[y>0]), np.log(y[y>0]), 1)[0])
         else:
@@ -102,26 +102,26 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
     if 'F' in opts:
         # # F - Radial distribution function, g(r)
         rdist, gr = calcgr(d, verbose=plot)
-        if log: print('Finished calculating F. g(r)')
+        if log: print('Finished calculating F. g(r)', file=open(log_output, 'a'))
         ssdata['rdist'] = rdist
         ssdata['gr'] = gr
         ssvect.append(rdist[np.where(gr == max(gr))][0])
 
     if 'G' in opts:
         # # G - Mean horizontal displacement
-        if log: print('Finished calculating F. avg. horiz. disp. (from midway point)')
+        if log: print('Finished calculating G. avg. horiz. disp. (from midway point)', file=open(log_output, 'a'))
         ssvect.append(deltax(d))
 
     if 'H' in opts:
         # # H - Change in density
-        if log: print('Finished calculating G. change in phi')
+        if log: print('Finished calculating H. change in phi', file=open(log_output, 'a'))
         ssvect.append(deltaphi(d))
 
     if 'I' in opts:
         # # I - average vector velocity
         ssvect.append(mean_vect_vel(d))
 
-    if log: print('Finished calculating summary statistics')
+    if log: print('Finished calculating summary statistics', file=open(log_output, 'a'))
     return ssvect, ssdata
 
 def deltax(data,usetype=[1]):

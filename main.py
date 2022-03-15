@@ -74,6 +74,10 @@ def main(args):
             x = x[:,:,0].float()
         else:
             x = x[:,:,1].float()
+    else:
+        x = torch.stack(x)
+        x = x.reshape(args.nruns, x.shape[-1]).float()
+
     # Run inference
     if 'flow' in args.posterioropt:
         flow_density_estimator_build_fun = posterior_nn(model='maf', hidden_features=60, num_transforms=3)
@@ -98,13 +102,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = 'Running cell migration inference using active brownian particle models and neural network approximators')
     #general options
     parser.add_argument('--sim', dest='simulate', action='store_true')
-    parser.add_argument('--test', dest='test', action='store_true')
+    parser.add_argument('--test', dest='test', action='store_true',help='Testing summary statistics using previously saved file')
     parser.add_argument('--no-test', dest='test', action='store_false')
-    parser.add_argument('--log', dest='log', action='store_true',help='Testing summary statistics using previously saved file')
+    parser.add_argument('--log', dest='log', action='store_true',help='Output_data to log_file')
     parser.add_argument('--no-log', dest='log', action='store_false')
     parser.add_argument('-s','--save_prob',type = float, default = 1, help='(float)\nProbability of saving file')
-    parser.add_argument('-nruns','--nruns',type = int, default = 2, help='(int)\nNumber of simulations to run')
-    parser.add_argument('-nprocs','--nprocs',type = int, default = 32, help='(int)\nNumber of cores to use')
+    parser.add_argument('-nruns','--nruns',type = int, default = 10, help='(int)\nNumber of simulations to run')
+    parser.add_argument('-nprocs','--nprocs',type = int, default = 2, help='(int)\nNumber of cores to use')
     parser.add_argument('-batch','--batch_size',type = int, default = 50, help='(int)\nBatchsize')
     #io data
     parser.add_argument('-ofo','--outputfolder', default = 'output/confluent/', help='(str)\nFolder for data')
@@ -115,8 +119,8 @@ if __name__ == "__main__":
     parser.add_argument('-theta', '--theta', nargs = '+', default = [],help='(list)\nList of parameter values to pass to simulation')
     parser.add_argument('-c', '--configfile', default = "include/config/simconfig.json")
     parser.add_argument('-d', '--thetadict', type=str, default = '{"factive":"v0", "pairstiff":"k", "tau":"tau", "alignment":"alignment","divrate":"divrate", "N":"N"}', help='(dict)\nDictionary mapping simulation parameters to passed parameters')
-    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [30,20,1, 0, 0.035, 100],help='(list)\nList of lowerbound parameters values')
-    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 1, 0.08, 2000], help='(list)\nList of upperbound parameters values')
+    parser.add_argument('-thetamin','--thetamin', nargs = '+', default = [15,15,1, 0, 0.035],help='(list)\nList of lowerbound parameters values')
+    parser.add_argument('-thetamax','--thetamax', nargs = '+', default = [150,150,10, 1, 0.08], help='(list)\nList of upperbound parameters values')
     parser.add_argument('-start','--starttime',nargs='+', default = [20], help='(int)\nStarting frame number for summary statistics')
     parser.add_argument('-end','--endtime',nargs='+', default = [200], help='(int)\nFinal frame number for summary statistics')
     # summary statistics to calculate

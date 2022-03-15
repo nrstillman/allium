@@ -14,6 +14,7 @@ import torch
 import pycapmd as capmd
 import allium
 from joblib import Parallel, delayed
+from tqdm import tqdm
 
 class Sim(object):
     def __init__(self, **kwargs):
@@ -66,9 +67,14 @@ class Sim(object):
             print("Caution: Running scratch and confluent simultaneously")
 
         theta = self.proposal.sample(sample_shape=torch.Size([self.num_simulations]))    
+        self.thetafilename = self.folder + self.run + '_'
+        print(theta, file=open(f'{self.thetafilename}sampled_theta_.txt', 'a'))
         batches = torch.split(theta, self.batch_size, dim=0)
-        simulation_outputs = Parallel(n_jobs=self.num_workers)(
-                delayed(self.wrapper)(batch) for batch in batches)
+        
+        with allium.utils.tqdm_joblib(tqdm(desc="Running simulations", total=self.num_simulations)) as progress_bar:
+            simulation_outputs = Parallel(n_jobs=self.num_workers)(
+                    delayed(self.wrapper)(batch) for batch in batches)
+
         x = torch.cat(simulation_outputs, dim=0)
         print(x.shape)
         return theta, simulation_outputs
@@ -82,15 +88,15 @@ class Sim(object):
         idx = []
         xout = torch.Tensor()#zeros((1,15,1))
         for i, params in enumerate(p):
-            print(f'Running simulation {self.counter}/{self.num_simulations} w params {params}')
+            print(f'\nRunning simulation {self.counter}/{self.num_simulations} w params {params}', file=open(f'{self.folder}_log.txt', 'a'))
             def sig_handler(signum, frame):
                 print(f'Error: segfault w params {params}')
 
             signal.signal(signal.SIGSEGV, sig_handler)
 
-            thetafilename = self.folder + self.run + '_'
+            self.thetafilename = self.folder + self.run + '_'
             for (a,b) in zip(list(self.pmap.keys()),params):
-                thetafilename+=f'{a}_{b:.1e}_'
+                self.thetafilename+=f'{a}_{b:.1e}_'
             if self.test:
                 theta = self.test_theta
                 try:
@@ -112,7 +118,7 @@ class Sim(object):
             save = random.uniform(0,1) < self.save_prob
             
             if save and not self.test:
-                with open(thetafilename[:-1] + '.p','wb') as f:
+                with open(self.thetafilename[:-1] + '.p','wb') as f:
                     pickle.dump(obs, f)
             #Calculate summary statistics here
             try:
@@ -123,25 +129,25 @@ class Sim(object):
                         tmp_obs = copy.deepcopy(obs)
                         tmp_obs.param.framerate = self.framerate
                         # rescale time based on frame rate
-                        vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e,usetypes=[1,2])
+                        vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e,usetypes=[1,2],log_output=f'{self.folder}_log.txt')
                         ssvect.append(vect0)
                         ssdata.append(data0)
                         #save with starttime            
-                        with open(f'{thetafilename}_starttime_{s}_ss.p','wb') as f:
+                        with open(f'{self.thetafilename}_starttime_{s}_ss.p','wb') as f:
                             pickle.dump([ssvect, ssdata, obs.param], f)
                     # below is horrible... needs to be sorted
                     ssvect = torch.as_tensor(np.asarray((ssvect[0],ssvect[1])).reshape(1,len(ssvect[0]),2))
                     xout = torch.cat((xout, ssvect),0)                
                 else:
                     obs.param.framerate = self.framerate
-                    ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime[0], endtime=self.endtime[0],usetypes=[1,2])
+                    ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime[0], endtime=self.endtime[0],usetypes=[1,2],log_output=f'{self.folder}_log.txt')
                     #save with starttime            
-                    with open(f'{thetafilename}_starttime_{self.starttime[0]}_ss.p','wb') as f:
+                    with open(f'{self.thetafilename}_starttime_{self.starttime[0]}_ss.p','wb') as f:
                         pickle.dump([ssvect, ssdata, obs.param], f)
                     ssvect = torch.as_tensor(np.asarray(ssvect).reshape(1,len(ssvect)))    
                     xout = torch.cat((xout, ssvect),0)                
             except Exception as e:
-                bad_output = f'{thetafilename}_badss.p'
+                bad_output = f'{self.thetafilename}_badss.p'
                 print(f"Error: Exception raised during calculation of summary statistiscs. Output saved to {bad_output}")
                 print(e)
                 with open(bad_output,'wb') as f:
@@ -164,7 +170,7 @@ class Sim(object):
                         \n Total Runtime: {toc - tic[0]:.4} seconds
                         \n -----------------------"""
             if log:
-                print(f'{message}', file=open('log.txt', 'a'))
+                print(f'{message}', file=open(f'{self.folder}_log.txt', 'a'))
             else:
                 print(f'{message}')        
                 print("\033[9A")
@@ -218,7 +224,7 @@ class Sim(object):
                 for key, value in zip(keys[:len(p)],p):                                        
                     value = np.array(value)
                     if log:
-                        print(f'{key} = {value}\n', file=open('log.txt', 'a'))
+                        print(f'{key} = {value}\n', file=open(f'{self.folder}_log.txt', 'a'))
                     else:
                         print(f'{key} = {value}\n')
                     if key == 'pairstiff':
@@ -248,7 +254,7 @@ class Sim(object):
                 return paramObj
     
         if self.log:
-            print(f"# of parameters = {len(params)}", file=open('log.txt', 'a'))
+            print(f"# of parameters = {len(params)}", file=open(f'{self.folder}_log.txt', 'a'))
         else:
             print(f"# of parameters = {len(params)}")
         tic = time.perf_counter()
@@ -267,7 +273,8 @@ class Sim(object):
             # Test for output
             if (t % params.output_time == 0): 
                 p = getPopulation(sim)   
-                printOutput(t, [tic, tic2], p,self.log)
+                if params.log == 'text':
+                    printOutput(t, [tic, tic2], p,self.log)
                 popArray.append(p)         
                 if (params.output_type == 'all'):
                     sim.saveData("text")
@@ -290,7 +297,7 @@ class Sim(object):
                 
                 sim.killCells(capmd.VectorInt(zapList))
                 if self.log:
-                    print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="", file=open('log.txt', 'a'))
+                    print("\n"*10+"Cell zapping stage completed" + "\n"*2,end="", file=open(f'{self.folder}_log.txt', 'a'))
             # Test for population dynamicss
             if (t % params.popdynfreq == 0): 
                 sim.populationDynamics(params.popdynfreq)
