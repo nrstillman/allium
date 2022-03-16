@@ -3,6 +3,7 @@ from scipy import optimize
 from scipy import stats
 import matplotlib.pyplot as plt
 
+from sklearn.metrics import r2_score
 
 def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [1,2],log_output="log.txt"):
     """
@@ -13,7 +14,8 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
     # remove any data post zap
     d.truncateto(starttime, endtime)
     if takeDrift:
-         d.takeDrift()
+        print('removing drift')
+        d.takeDrift()
 
     ssdata = {}
     ssvect = []
@@ -108,9 +110,16 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssvect.append(rdist[np.where(gr == max(gr))][0])
 
     if 'G' in opts:
-        # # G - Mean horizontal displacement
-        if log: print('Finished calculating G. avg. horiz. disp. (from midway point)', file=open(log_output, 'a'))
-        ssvect.append(deltax(d))
+        # # G - Division fit
+        if log: print('Finished calculating G. Division details', file=open(log_output, 'a'))
+
+        model, r2 = fit_div_rate(d, verbose=plot)
+
+        # append model fits, error, N0
+        ssvect.append(model[0])
+        ssvect.append(model[1])
+        ssvect.append(r2)
+        ssvect.append(d.Nvals[0])
 
     if 'H' in opts:
         # # H - Change in density
@@ -121,8 +130,27 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         # # I - average vector velocity
         ssvect.append(mean_vect_vel(d))
 
+    if 'J' in opts:
+        if log: print('Finished calculating G. avg. horiz. disp. (from midway point)', file=open(log_output, 'a'))
+        ssvect.append(deltax(d))
+
     if log: print('Finished calculating summary statistics', file=open(log_output, 'a'))
     return ssvect, ssdata
+
+def fit_div_rate(data,verbose=True):
+    # get time, N values
+    x = np.linspace(0,data.Nsnap*data.param.framerate,num=data.Nsnap)
+    y = data.Nvals
+    # fit exponential
+    model = np.polyfit(x, np.log(y), 1)
+    predict = np.poly1d(model)
+    r2 = r2_score(y, predict(x))
+    if verbose:
+        plt.figure()
+        plt.plot(x, np.poly1d(np.polyfit(x, np.log(y), 1))(x), 'r',lw=2)
+        plt.plot(x,np.log(y),'r.-',lw=2)
+        plt.show()
+    return model,r2
 
 def deltax(data,usetype=[1]):
     tracers_start = data.gettypes(usetype,0)
@@ -225,17 +253,17 @@ def getMSD(data,takeDrift, usetype=[1],verbose=True):
     data.hasMSD = True
     data.msd = msd
                     #careful with data.param here
-    xval=np.linspace(0,data.Nsnap*data.param.framerate,num=data.Nsnap)
+    tval=np.linspace(0,data.Nsnap*data.param.framerate,num=data.Nsnap)
     if verbose:
         fig=plt.figure()
-        plt.loglog(xval,msd,'r.-',lw=2)
-        plt.loglog(xval,msd[1]/(1.0*xval[1])*xval,'-',lw=2,color=[0.5,0.5,0.5])
+        plt.loglog(tval,msd,'r.-',lw=2)
+        plt.loglog(tval,msd[1]/(1.0*tval[1])*tval,'-',lw=2,color=[0.5,0.5,0.5])
         plt.xlabel('time (hours)')
         plt.ylabel('MSD')
         plt.title('Mean square displacement')
         plt.show()
 
-    return xval, msd, data
+    return tval, msd, data
 
 # Velocity autocorrelation function
 # do use tracers
@@ -330,7 +358,7 @@ def calcgr(data,  verbose = True, periodic=True, section = [150,550],resolution=
     gr = gr/gr[-1]
     if verbose:
         fig=plt.figure()
-        plt.plot(rdist, gr)
+        plt.plot(rdist, gr,'r.-',lw=2)
         # plt.xlim([0,max_distance])
         plt.xlabel('r')
         plt.ylabel('g(r)')

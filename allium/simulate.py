@@ -4,7 +4,6 @@ import copy
 import signal
 # This will be replaced by a called function in later releases
 sys.path.append('simulator/') 
-
 import json
 import numpy as np
 import pickle 
@@ -37,8 +36,7 @@ class Sim(object):
         if not hasattr(self,'nfeatures'):
             self.nfeatures = 15
         if not hasattr(self,'framerate'):
-            self.framerate = 0.0166
-
+            self.framerate = 10/60
         if not hasattr(self,'test'):
             self.test = False
         if not hasattr(self,'pmap'):

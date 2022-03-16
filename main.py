@@ -107,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument('--log', dest='log', action='store_true',help='Output_data to log_file')
     parser.add_argument('--no-log', dest='log', action='store_false')
     parser.add_argument('-s','--save_prob',type = float, default = 1, help='(float)\nProbability of saving file')
-    parser.add_argument('-nruns','--nruns',type = int, default = 10, help='(int)\nNumber of simulations to run')
+    parser.add_argument('-nruns','--nruns',type = int, default = 1, help='(int)\nNumber of simulations to run')
     parser.add_argument('-nprocs','--nprocs',type = int, default = 2, help='(int)\nNumber of cores to use')
     parser.add_argument('-batch','--batch_size',type = int, default = 50, help='(int)\nBatchsize')
     #io data
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     # summary statistics to calculate
     parser.add_argument('-ssopts','--summstatsopts', nargs = '+', default = ['A','B','C','D','E','G'], help='(list)\nSummary statistics to calculate (see allium/summstats.py for more details')
     parser.add_argument('-state','--state', type = str, default = 'confluent', help='(str)\nOption for calculation of posterior (though both sets of summstats are saved)')
-    parser.add_argument('-framerate','--framerate', type = str, default = 0.0166, help='(float)\nValue for the framerate conversion from output frame to [hours]')
+    parser.add_argument('-framerate','--framerate', type = str, default = 0.166, help='(float)\nValue for the framerate conversion from output frame to [hours]')
     #posterior options
     parser.add_argument('--pcalc', dest='pcalc', help = '(bool)\nCalculating posterior based on simulation run')
     parser.add_argument('--non-pcalc', dest='pcalc')
