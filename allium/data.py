@@ -28,6 +28,7 @@ class ExperimentData:
             # self.radius = self.radius[start:endtime]
             self.ptype = self.ptype[start:endtime]
             self.truncated = True
+            self.Nvals = self.Nvals[start:endtime]
         else:
             print("Already truncated. Skipping this step")
 
@@ -46,7 +47,7 @@ class ExperimentData:
         else:
             print("Drift already removed. Skipping this step")
 
-    def __init__(self,data,properties, framerate=0.083, Lx = 800, Ly =800, R = 10, umpp=0.8):
+    def __init__(self,data,properties, framerate=0.166, Lx = 800, Ly =800, R = 10, umpp=0.8):
 
         self.Nvariable = True
         self.truncated = False
@@ -55,7 +56,8 @@ class ExperimentData:
         self.umpp = umpp #microns per pixel
         self.sigma = R
 
-        self.Nvals = [data[data[:,1] == n].shape[0] for n in range(properties['t'][-1])][2:]
+        self.Nvals = np.array([data[data[:,1] == n].shape[0] for n in range(properties['t'][-1])])
+        self.Nvals = self.Nvals[self.Nvals != 0][1:]
         self.flags = np.unique(data[:,0]) 
         # count number of occurances of each flag
         counts = np.bincount(data[:,0].astype(int))

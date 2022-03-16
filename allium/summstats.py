@@ -113,7 +113,14 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         # # G - Division fit
         if log: print('Finished calculating G. Division details', file=open(log_output, 'a'))
 
-        model, r2 = fit_div_rate(d, verbose=plot)
+        tvals, Nvals = fit_div_rate(d, verbose=plot)
+        ssdata['tval3'] = tvals
+        ssdata['Nvals'] = Nvals
+        
+        # fit exponential
+        model = np.polyfit(tvals, np.log(Nvals), 1)
+        predict = np.poly1d(model)
+        r2 = r2_score(Nvals, predict(tvals))
 
         # append model fits, error, N0
         ssvect.append(model[0])
@@ -139,18 +146,14 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
 
 def fit_div_rate(data,verbose=True):
     # get time, N values
-    x = np.linspace(0,data.Nsnap*data.param.framerate,num=data.Nsnap)
-    y = data.Nvals
-    # fit exponential
-    model = np.polyfit(x, np.log(y), 1)
-    predict = np.poly1d(model)
-    r2 = r2_score(y, predict(x))
+    tval = np.linspace(0,data.Nsnap*data.param.framerate,num=data.Nsnap)
+    Nvals = data.Nvals
     if verbose:
         plt.figure()
-        plt.plot(x, np.poly1d(np.polyfit(x, np.log(y), 1))(x), 'r',lw=2)
-        plt.plot(x,np.log(y),'r.-',lw=2)
+        plt.plot(tval, np.poly1d(np.polyfit(tval, np.log(Nvals), 1))(tval), 'r',lw=2)
+        plt.plot(tval,np.log(Nvals),'r.-',lw=2)
         plt.show()
-    return model,r2
+    return tval, Nvals
 
 def deltax(data,usetype=[1]):
     tracers_start = data.gettypes(usetype,0)

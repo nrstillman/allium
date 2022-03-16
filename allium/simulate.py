@@ -69,7 +69,7 @@ class Sim(object):
         print(theta, file=open(f'{self.thetafilename}sampled_theta_.txt', 'a'))
         batches = torch.split(theta, self.batch_size, dim=0)
         
-        with allium.utils.tqdm_joblib(tqdm(desc="Running simulations", total=self.num_simulations)) as progress_bar:
+        with allium.utils.tqdm_joblib(tqdm(desc="Running simulations", total=self.batch_size)) as progress_bar:
             simulation_outputs = Parallel(n_jobs=self.num_workers)(
                     delayed(self.wrapper)(batch) for batch in batches)
 
