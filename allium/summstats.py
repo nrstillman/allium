@@ -56,9 +56,9 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0])
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
         ssvect.append(ssdata['msd'][-1])
-        #v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),xdata = tval[1:], ydata = msd[1:])[0]
-        #ssvect.append(v0)
-        #ssvect.append(tau)
+        v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),xdata = tval[1:], ydata = msd[1:])[0]
+        ssvect.append(v0)
+        ssvect.append(tau)
     if 'D' in opts:     
         # # D - Self Intermediate Scattering Function
         qval = 2*np.pi/d.sigma*np.array([1,0])
@@ -77,6 +77,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
             ssvect.append(tval3[SelfInt2 < 0.5][0])
         else:
             ssvect.append(tval3[-1])
+            
     if 'E' in opts:
         # # E - real space velocity correlation function ('swirlyness')
         velcorrReal = np.zeros((150,))
