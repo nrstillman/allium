@@ -3,24 +3,24 @@
     "filename": "nconfluent",
     "output_time": 166, 
     "output_type": "text",
-    "t_final": 33200, 
+    "t_final": 332000, 
     "popdynfreq": 51,
     "zaptime": 40000, 
     
     "phi": 1,
     "R": 10,
 
-    "Lx": 800,
-    "Ly": 800,
+    "Lx": 2000,
+    "Ly": 2000,
 
     "dt": 0.001,
     "dim": 2,
 
     "eps": 0.001,
-    "N": 250,
+    "N": 6,
     "init_opt": "random_unif",
-    "bc_opt": "periodic",
-    "Ntracer": 25,
+    "bc_opt": "bounded",
+    "Ntracer": 10,
     "Nstem": 0,
     "btype": 0,
     "flag": 0,
@@ -31,19 +31,19 @@
     "fade": 1,
     "pairstiff": [
         [
-            60,
-            60,
-            60
+            70,
+            70,
+            70
         ],
         [
-            60,
-            60,
-            60
+            70,
+            70,
+            70
         ],
         [
-            60,
-            60,
-            60
+            70,
+            70,
+            70
         ]
     ],
 
@@ -65,9 +65,9 @@
         ]
     ],
     "factive": [
-        70,
-        70,
-        70
+        40,
+        40,
+        40
     ],
     "zeta": [
         1,
@@ -75,9 +75,9 @@
         1
     ],
     "tau": [
-        2.5,
-        2.5,
-        2.5
+        10,
+        10,
+        10
     ],
     "alignment": [
         0,
@@ -90,9 +90,9 @@
         0.0
     ],
     "divrate": [
-        0.074,
+        0.0476,
         0.0,
-        0.074
+        0.0476
     ],
     "maxZ": 6
 }

@@ -127,7 +127,7 @@ class Sim(object):
                         tmp_obs = copy.deepcopy(obs)
                         tmp_obs.param.framerate = self.framerate
                         # rescale time based on frame rate
-                        vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,opts = self.ssopts,log = self.log, starttime=s, endtime=e,usetypes=[1,2],log_output=f'{self.folder}_log.txt')
+                        vect0, data0 = allium.summstats.calculate_summary_statistics(tmp_obs,useall = self.useall,opts = self.ssopts,log = self.log, starttime=s, endtime=e,usetypes=[1,2],log_output=f'{self.folder}_log.txt')
                         ssvect.append(vect0)
                         ssdata.append(data0)
                         #save with starttime            
@@ -138,7 +138,7 @@ class Sim(object):
                     xout = torch.cat((xout, ssvect),0)                
                 else:
                     obs.param.framerate = self.framerate
-                    ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,opts = self.ssopts,log = self.log, starttime=self.starttime[0], endtime=self.endtime[0],usetypes=[1,2],log_output=f'{self.folder}_log.txt')
+                    ssvect, ssdata = allium.summstats.calculate_summary_statistics(obs,useall = self.useall,opts = self.ssopts,log = self.log, starttime=self.starttime[0], endtime=self.endtime[0],usetypes=[1,2],log_output=f'{self.folder}_log.txt')
                     #save with starttime            
                     with open(f'{self.thetafilename}_starttime_{self.starttime[0]}_ss.p','wb') as f:
                         pickle.dump([ssvect, ssdata, obs.param], f)
@@ -219,7 +219,8 @@ class Sim(object):
             if not bool(len(p)):
                 print("No parameters updated")
             else:
-                for key, value in zip(keys[:len(p)],p):                                        
+                for key, value in zip(keys[:len(p)],p):  
+                    print(key,value)                                      
                     value = np.array(value)
                     if log:
                         print(f'{key} = {value}\n', file=open(f'{self.folder}_log.txt', 'a'))
@@ -271,8 +272,7 @@ class Sim(object):
             # Test for output
             if (t % params.output_time == 0): 
                 p = getPopulation(sim)   
-                if params.log == 'text':
-                    printOutput(t, [tic, tic2], p,self.log)
+                printOutput(t, [tic, tic2], p,self.log)
                 popArray.append(p)         
                 if (params.output_type == 'all'):
                     sim.saveData("text")

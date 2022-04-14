@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import r2_score
 
-def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [1,2],log_output="log.txt"):
+def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],useall=True, log=False,starttime=60,endtime=320,takeDrift=False, plot = False, usetypes = [1,2],log_output="log.txt"):
     """
     Calculates summary statistics.
 
@@ -19,6 +19,8 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
 
     ssdata = {}
     ssvect = []
+    all_ssvect = []
+
     if 'A' in opts:
         # # # # # A - Velocity distributions and mean velocity
         velbins=np.linspace(0,10,100)
@@ -33,10 +35,13 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssdata['vdist2'] = vdist2
         if log: print('Finished calculating A. vel. dist & mean vel', file=open(log_output, 'a'))
         ssvect.append(vav.mean()) 
+        all_ssvect.append(vav)
         ssvect.append(stats.kurtosis(vdist,fisher=False))
         ssvect.append(vdist.mean())
         ssvect.append(vdist.var())
+        all_ssvect.append(vdist)
         ssvect.append(stats.kurtosis(vdist2,fisher=False))
+        all_ssvect.append(vdist2)
         ssvect.append(vdist2.mean())
         ssvect.append(vdist2.var())
     if 'B' in opts:
@@ -47,6 +52,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssdata['v2av'] = v2av
         if log: print('Finished calculating B. autocorr vel fcn', file=open(log_output, 'a'))
         ssvect.append(tval2[velauto < 5e-1][0])
+        all_ssvect.append(velauto)
     if 'C' in opts:
         # C - Mean square displacement
         tval, msd, d = getMSD(d,takeDrift, usetype=[1],verbose=plot)
@@ -56,9 +62,10 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[0])
         ssvect.append(np.polyfit(np.log(tval[1:]), np.log(msd[1:]), 1)[1])
         ssvect.append(ssdata['msd'][-1])
-        v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),xdata = tval[1:], ydata = msd[1:])[0]
-        ssvect.append(v0)
-        ssvect.append(tau)
+        all_ssvect.append(msd)
+        # v0, tau = optimize.curve_fit(lambda t, v0, tau:  2*v0*v0*tau*(t - tau*(1-np.exp(-t/tau))),xdata = tval[1:], ydata = msd[1:])[0]
+        # ssvect.append(v0)
+        # ssvect.append(tau)
     if 'D' in opts:     
         # # D - Self Intermediate Scattering Function
         qval = 2*np.pi/d.sigma*np.array([1,0])
@@ -72,6 +79,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         xmax = d.param.Ly
         ssdata['dx'] = dx
         ssdata['xmax'] = xmax
+        all_ssvect.append(SelfInt2)
         if log: print('Finished calculating D. self-intermediate scattering fcn', file=open(log_output, 'a'))
         if np.sum(SelfInt2 < 0.5) > 0:
             ssvect.append(tval3[SelfInt2 < 0.5][0])
@@ -92,7 +100,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         velcorrReal/=count
         ssdata['velcorrReal'] = velcorrReal
         ssdata['spacebins'] = spacebins
-
+        all_ssvect.append(velcorrReal)
         x = spacebins[(50<spacebins) & (spacebins < 300)]
         y = velcorrReal[(50<spacebins) & (spacebins< 300)]
         
@@ -109,7 +117,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssdata['rdist'] = rdist
         ssdata['gr'] = gr
         ssvect.append(rdist[np.where(gr == max(gr))][0])
-
+        all_ssvect.append(gr)
     if 'G' in opts:
         # # G - Division fit
         if log: print('Finished calculating G. Division details', file=open(log_output, 'a'))
@@ -128,7 +136,7 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssvect.append(model[1])
         ssvect.append(r2)
         ssvect.append(d.Nvals[0])
-
+        all_ssvect.append(np.log(Nvals))
     if 'H' in opts:
         # # H - Change in density
         if log: print('Finished calculating H. change in phi', file=open(log_output, 'a'))
@@ -143,7 +151,19 @@ def calculate_summary_statistics(d, opts = ['A','B','C','D','E','F','G','H'],log
         ssvect.append(deltax(d))
 
     if log: print('Finished calculating summary statistics', file=open(log_output, 'a'))
-    return ssvect, ssdata
+    if useall:                
+        all_ssvect = [rescale(n) for n in all_ssvect]
+        outvec = np.array([])
+        for n in all_ssvect:
+            outvec = np.hstack((outvec,n))
+
+        return outvec, ssdata
+    else:
+        return ssvect, ssdata
+
+def rescale(d):
+    #simple rescaling function (to btwn [0,1]) for saving all summvects
+    return (d - np.min(d))/(np.max(d) - np.min(d))
 
 def fit_div_rate(data,verbose=True):
     # get time, N values
@@ -222,6 +242,37 @@ def getVelDist(data,bins,bins2,usetype=[0,1],verbose=True):
     return vav, vdist,vdist2        
 
 # use tracers
+def simpleMSD(data, framerate=1):
+
+    Nsnap = len(data)
+    msd=np.empty((Nsnap,))
+    Ntrack  =1
+    for u in range(Nsnap): 
+        smax=Nsnap-u
+
+        # get rval for up to smax
+        rt = data[:smax,:].reshape(smax, Ntrack,2)
+        # get rval for u to end
+        rtplus = data[u:,:].reshape(smax, Ntrack, 2)
+
+        dr  = rt - rtplus
+ 
+        msd[u]=np.sum(np.sum(np.sum(dr**2,axis=2),axis=1),axis=0)/(Ntrack*smax)
+
+
+    #careful with data.param here
+    tval=np.linspace(0,Nsnap*framerate,num=Nsnap)
+    if verbose:
+        fig=plt.figure()
+        plt.loglog(tval,msd,'r.-',lw=2)
+        plt.loglog(tval,msd[1]/(1.0*tval[1])*tval,'-',lw=2,color=[0.5,0.5,0.5])
+        plt.xlabel('time (hours)')
+        plt.ylabel('MSD')
+        plt.title('Mean square displacement')
+        plt.show()
+
+    return tval, msd, data
+
 def getMSD(data,takeDrift, usetype=[1],verbose=True):
     msd=np.empty((data.Nsnap,))
     # Get tracers
