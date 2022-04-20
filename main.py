@@ -189,14 +189,14 @@ if __name__ == "__main__":
         "-d",
         "--thetadict",
         type=str,
-        default='{"factive":"v0", "pairatt":"eps", "tau":"tau"}',#, "phi":"phi"}',
+        default='{"factive":"v0", "pairatt":"eps", "tau":"tau", "phi":"phi"}',
         help="(dict)\nDictionary mapping simulation parameters to passed parameters",
     )
     parser.add_argument(
         "-thetamin",
         "--thetamin",
         nargs="+",
-        default=[0, 0, 10, 0],
+        default=[0, 0, 10, 0.2],
         help="(list)\nList of lowerbound parameters values",
     )
     parser.add_argument(
@@ -239,7 +239,7 @@ if __name__ == "__main__":
         "-framerate",
         "--framerate",
         type=str,
-        default=0.166,
+        default=1,
         help="(float)\nValue for the framerate conversion from output frame to [hours]",
     )
     # posterior options

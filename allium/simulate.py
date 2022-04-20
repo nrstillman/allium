@@ -233,6 +233,9 @@ class Sim(object):
                     elif key == 'N':
                         setattr(params, 'N', int(value))
                         setattr(params, 'Ntracer', int(value*tracers))
+                    elif key == 'phi':
+                        setattr(params, 'phi', value)
+                        # setattr(params, 'Ntracer', int(value*tracers))
                     elif (key == 'deathrate') or (key == 'divrate'):
                         setattr(params, key, [value,0,value])
                     else:
