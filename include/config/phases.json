@@ -1,0 +1,98 @@
+{
+    "outputfolder": "allium/data/sim/",
+    "filename": "model1-phases",
+    "output_time": 200, 
+    "output_type": "none",
+    "t_final": 130000, 
+    "popdynfreq": 10000000,
+    "zaptime": 10000000, 
+    
+    "phi": 1,
+    "R": 1,
+
+    "Lx": 55,
+    "Ly": 55,
+
+    "dt": 0.01,
+    "dim": 2,
+
+    "eps": 0.001,
+    "N": 1000,
+    "init_opt": "random_unif",
+    "bc_opt": "periodic",
+    "Ntracer": 1000,
+    "Nstem": 0,
+    "btype": 0,
+    "flag": 0,
+    "type": 0,
+    "poly": 0.3,
+    "cutoff": 3,
+    "ntypes": 1,
+    "fade": 1,
+    "pairstiff": [
+        [
+            10,
+            10,
+            10
+        ],
+        [
+            10,
+            1,
+            1
+        ],
+        [
+            10,
+            1,
+            1
+        ]
+    ],
+
+    "pairatt": [
+        [
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0
+        ]
+    ],
+    "factive": [
+        0,
+        0,
+        0.01
+    ],
+    "zeta": [
+        1,
+        1,
+        1
+    ],
+    "tau": [
+        0,
+        400,
+        400
+    ],
+    "alignment": [
+        0,
+        0,
+        0
+    ],
+    "deathrate": [
+        0.0,
+        0,
+        0.0
+    ],
+    "divrate": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "maxZ": 6
+}

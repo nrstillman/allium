@@ -133,7 +133,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--usepart", dest="useall", action="store_false", help="Use summarys of summary statistics data"
     )
-
     parser.add_argument(
         "--log", dest="log", action="store_true", help="Output_data to log_file"
     )
@@ -185,26 +184,26 @@ if __name__ == "__main__":
         default=[],
         help="(list)\nList of parameter values to pass to simulation",
     )
-    parser.add_argument("-c", "--configfile", default="include/config/simconfig.json")
+    parser.add_argument("-c", "--configfile", default="include/config/phases.json")
     parser.add_argument(
         "-d",
         "--thetadict",
         type=str,
-        default='{"factive":"v0", "pairstiff":"k", "tau":"tau", "alignment":"alignment","divrate":"divrate", "N":"N"}',
+        default='{"factive":"v0", "pairatt":"eps", "tau":"tau"}',#, "phi":"phi"}',
         help="(dict)\nDictionary mapping simulation parameters to passed parameters",
     )
     parser.add_argument(
         "-thetamin",
         "--thetamin",
         nargs="+",
-        default=[15, 15, 1, 0, 0.035],
+        default=[0, 0, 10, 0],
         help="(list)\nList of lowerbound parameters values",
     )
     parser.add_argument(
         "-thetamax",
         "--thetamax",
         nargs="+",
-        default=[150, 150, 10, 1, 0.08],
+        default=[0.2, 0.15, 400, 1],
         help="(list)\nList of upperbound parameters values",
     )
     parser.add_argument(
